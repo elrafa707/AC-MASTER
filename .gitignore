@@ -1,0 +1,21 @@
+# Dependencias y compilados
+node_modules/
+build/
+.dart_tool/
+
+# Secretos y configuración local (usa los archivos .example como plantilla)
+.env
+.env.*
+!.env.example
+google-services.json
+firebase-service-account*.json
+
+# Fotos subidas al servidor
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Varios
+*.log
+.DS_Store
+.idea/
+.vscode/

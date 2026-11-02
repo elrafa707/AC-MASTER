@@ -1,0 +1,87 @@
+{
+  "sintomas": [
+    {
+      "clave": "NO_ENFRIA",
+      "etiqueta": "No enfría",
+      "detalle": "El aire sale, pero no baja la temperatura"
+    },
+    {
+      "clave": "NO_ENCIENDE",
+      "etiqueta": "No enciende",
+      "detalle": "No responde al control ni al botón"
+    },
+    {
+      "clave": "GOTEA",
+      "etiqueta": "Gotea agua",
+      "detalle": "Hay humedad o agua debajo de la unidad"
+    },
+    {
+      "clave": "RUIDO",
+      "etiqueta": "Hace ruido",
+      "detalle": "Vibración o sonido fuera de lo habitual"
+    },
+    {
+      "clave": "MAL_OLOR",
+      "etiqueta": "Huele raro",
+      "detalle": "Olor a humedad o a quemado al encender"
+    }
+  ],
+  "preguntas": [
+    {
+      "id": "modo_frio",
+      "texto": "¿El control está en modo frío (copo de nieve) y a menos de 24 °C?",
+      "opciones": [
+        "Sí",
+        "No",
+        "No sé"
+      ]
+    },
+    {
+      "id": "sale_aire",
+      "texto": "¿Sale aire por la unidad interior?",
+      "opciones": [
+        "Sí, con fuerza",
+        "Sí, pero muy débil",
+        "No sale aire"
+      ]
+    },
+    {
+      "id": "ventilador_exterior",
+      "texto": "¿Gira el ventilador de la unidad exterior?",
+      "opciones": [
+        "Sí",
+        "No",
+        "No sé"
+      ],
+      "ayuda": "La unidad exterior es la que está afuera; se ve un ventilador detrás de una rejilla."
+    },
+    {
+      "id": "hielo_tuberia",
+      "texto": "¿Ves hielo o escarcha en las tuberías o en la unidad interior?",
+      "opciones": [
+        "Sí",
+        "No",
+        "No sé"
+      ]
+    },
+    {
+      "id": "ultima_limpieza_filtros",
+      "texto": "¿Cuándo se limpiaron los filtros por última vez?",
+      "opciones": [
+        "Hace menos de 3 meses",
+        "Entre 3 y 6 meses",
+        "Hace más de 6 meses",
+        "No sé"
+      ]
+    },
+    {
+      "id": "desde_cuando",
+      "texto": "¿Desde cuándo notas la falla?",
+      "opciones": [
+        "Hoy",
+        "Esta semana",
+        "Hace más de una semana"
+      ]
+    }
+  ]
+}

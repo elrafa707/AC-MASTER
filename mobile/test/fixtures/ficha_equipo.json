@@ -1,0 +1,36 @@
+{
+  "id": 17,
+  "clienteId": 3,
+  "clienteNombre": "Rafael Báez",
+  "numeroSerie": "FIX-0001",
+  "marca": "Mirage",
+  "modelo": "MRG123",
+  "tipo": "Minisplit",
+  "capacidadBTU": 12000,
+  "refrigerante": "R-410A",
+  "ubicacion": "Sala",
+  "fechaInstalacion": "2024-03-18",
+  "fechaRegistro": "2026-11-02T02:26:12.000Z",
+  "historial": [
+    {
+      "id": 26,
+      "tipo": "PREDICCION",
+      "titulo": "Diagnóstico del asistente: Filtros saturados de polvo",
+      "descripcion": "Síntomas: No enfría. Confianza: 70%.",
+      "fecha": "2026-11-02T02:26:12.000Z",
+      "diagnosticoId": 13,
+      "solicitudId": null,
+      "tecnicoNombre": null
+    },
+    {
+      "id": 25,
+      "tipo": "INSTALACION",
+      "titulo": "Instalación del equipo",
+      "descripcion": "Fecha de instalación indicada por el cliente al registrar el equipo.",
+      "fecha": "2024-03-18T12:00:00.000Z",
+      "diagnosticoId": null,
+      "solicitudId": null,
+      "tecnicoNombre": null
+    }
+  ]
+}

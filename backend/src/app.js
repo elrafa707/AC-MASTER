@@ -5,6 +5,8 @@ import { consulta } from './config/db.js';
 import { env } from './config/env.js';
 import { manejadorErrores, rutaNoEncontrada } from './middlewares/error-handler.js';
 import { authRouter } from './modules/auth/auth.routes.js';
+import { diagnosticosRouter } from './modules/diagnosticos/diagnosticos.routes.js';
+import { equiposRouter } from './modules/equipos/equipos.routes.js';
 import { usuariosRouter } from './modules/usuarios/usuarios.routes.js';
 
 export function crearApp() {
@@ -28,6 +30,8 @@ export function crearApp() {
   const api = express.Router();
   api.use('/auth', authRouter);
   api.use(usuariosRouter);
+  api.use(equiposRouter);
+  api.use(diagnosticosRouter);
   app.use('/api/v1', api);
 
   app.use(rutaNoEncontrada);

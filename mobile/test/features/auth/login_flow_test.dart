@@ -44,7 +44,7 @@ void main() {
     await enviar(tester);
 
     expect(find.text('Hola, Rafael'), findsOneWidget);
-    expect(find.text('Cliente'), findsOneWidget);
+    expect(find.text('MIS EQUIPOS'), findsOneWidget);
     expect(tokens.actual, 'token-demo');
   });
 

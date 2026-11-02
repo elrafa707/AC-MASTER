@@ -27,14 +27,35 @@ export function obtenerPool() {
   return poolPromise;
 }
 
-/** Atajo para una consulta parametrizada: consulta('SELECT ... @id', { id: [sql.Int, 5] }). */
-export async function consulta(texto, parametros = {}) {
-  const pool = await obtenerPool();
-  const request = pool.request();
+function ejecutar(request, texto, parametros) {
   for (const [nombre, [tipo, valor]] of Object.entries(parametros)) {
     request.input(nombre, tipo, valor);
   }
   return request.query(texto);
+}
+
+/** Atajo para una consulta parametrizada: consulta('SELECT ... @id', { id: [sql.Int, 5] }). */
+export async function consulta(texto, parametros = {}) {
+  const pool = await obtenerPool();
+  return ejecutar(pool.request(), texto, parametros);
+}
+
+/**
+ * Ejecuta fn dentro de una transacción. fn recibe una función con la misma firma que consulta();
+ * si fn lanza un error se hace rollback y el error se propaga.
+ */
+export async function enTransaccion(fn) {
+  const pool = await obtenerPool();
+  const transaccion = new sql.Transaction(pool);
+  await transaccion.begin();
+  try {
+    const resultado = await fn((texto, parametros = {}) => ejecutar(transaccion.request(), texto, parametros));
+    await transaccion.commit();
+    return resultado;
+  } catch (err) {
+    await transaccion.rollback().catch(() => {});
+    throw err;
+  }
 }
 
 export async function cerrarPool() {

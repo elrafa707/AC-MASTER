@@ -37,7 +37,12 @@ services:
       - |
         for f in /scripts/*.sql; do
           echo "Aplicando $$f"
-          /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P "$$MSSQL_SA_PASSWORD" -C -b -I -f 65001 -i "$$f" || exit 1
+          # Reintenta: al reiniciar, SQL Server responde antes de terminar de abrir las bases existentes.
+          for intento in 1 2 3 4 5 6; do
+            /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P "$$MSSQL_SA_PASSWORD" -C -b -I -f 65001 -i "$$f" && break
+            [ "$$intento" = 6 ] && exit 1
+            echo "Reintentando en 5 s..."; sleep 5
+          done
         done
         echo "Base de datos lista"
     restart: "no"

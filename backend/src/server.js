@@ -6,6 +6,11 @@ const app = crearApp();
 
 const servidor = app.listen(env.PORT, '0.0.0.0', () => {
   console.log(`AC-Master API escuchando en http://localhost:${env.PORT}/api/v1`);
+  console.log(
+    env.ASISTENTE_MODO === 'claude'
+      ? `Asistente de diagnóstico: Claude (${env.ANTHROPIC_MODEL})`
+      : 'Asistente de diagnóstico: SIMULADO (sin ANTHROPIC_API_KEY; no analiza fotos)',
+  );
 });
 
 obtenerPool()

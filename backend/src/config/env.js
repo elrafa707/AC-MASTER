@@ -15,6 +15,14 @@ const esquema = z.object({
 
   JWT_SECRET: z.string().min(32, 'JWT_SECRET debe tener al menos 32 caracteres'),
   JWT_EXPIRES_IN: z.string().default('7d'),
+
+  UPLOADS_DIR: z.string().default('./uploads'),
+
+  // Asistente de diagnóstico: "claude" usa la API de Anthropic; "simulado" usa reglas locales
+  // (para desarrollar y probar sin clave). Si no se indica, se elige "claude" solo cuando hay clave.
+  ASISTENTE_MODO: z.enum(['claude', 'simulado']).optional(),
+  ANTHROPIC_API_KEY: z.string().optional(),
+  ANTHROPIC_MODEL: z.string().default('claude-opus-5-5'),
 });
 
 const resultado = esquema.safeParse(process.env);
@@ -25,4 +33,12 @@ if (!resultado.success) {
   process.exit(1);
 }
 
-export const env = resultado.data;
+const datos = resultado.data;
+datos.ASISTENTE_MODO ??= datos.ANTHROPIC_API_KEY ? 'claude' : 'simulado';
+
+if (datos.ASISTENTE_MODO === 'claude' && !datos.ANTHROPIC_API_KEY) {
+  console.error('ASISTENTE_MODO=claude requiere ANTHROPIC_API_KEY en el archivo .env');
+  process.exit(1);
+}
+
+export const env = datos;

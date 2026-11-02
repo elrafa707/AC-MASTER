@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import { after, before, describe, test } from 'node:test';
 import request from 'supertest';
 
-process.env.NODE_ENV = 'test';
-const { crearApp } = await import('../src/app.js');
-const { cerrarPool, consulta, sql } = await import('../src/config/db.js');
+import { crearApp, db } from './helpers.js';
+
+const { cerrarPool, consulta, sql } = db;
 
 const app = crearApp();
 const correo = `prueba.${Date.now()}@acmaster.test`;

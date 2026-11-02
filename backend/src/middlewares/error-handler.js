@@ -17,6 +17,6 @@ export function manejadorErrores(err, _req, res, _next) {
     return res.status(400).json({ error: { codigo: 'JSON_INVALIDO', mensaje: 'El cuerpo no es JSON válido' } });
   }
 
-  if (env.NODE_ENV !== 'test') console.error(err);
+  if (env.NODE_ENV !== 'test' || process.env.DEBUG_ERRORES) console.error(err);
   res.status(500).json({ error: { codigo: 'ERROR_INTERNO', mensaje: 'Ocurrió un error inesperado' } });
 }

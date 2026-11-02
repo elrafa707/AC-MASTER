@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../core/router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../models/usuario.dart';
 import '../../shared/widgets/brand_mark.dart';
 import '../../shared/widgets/section_label.dart';
 import '../../shared/widgets/status_pill.dart';
 import '../auth/session_controller.dart';
+import '../cliente/cliente_home.dart';
 
-/// Panel provisional por rol. Las etapas 2 a 4 lo reemplazan por el Dashboard de cada rol (interfaz 2).
+/// Panel principal (interfaz 2), distinto según el rol.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -16,26 +19,6 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final usuario = ref.watch(sessionProvider).value;
     if (usuario == null) return const SizedBox.shrink();
-
-    final tema = Theme.of(context);
-    final c = context.acColors;
-    final modulos = switch (usuario.rol) {
-      Rol.cliente => const [
-          ('Diagnóstico inteligente', 'Etapa 2', Icons.ac_unit_rounded),
-          ('Mis equipos e historial', 'Etapa 2', Icons.history_rounded),
-          ('Seguimiento de solicitudes', 'Etapa 3', Icons.timeline_rounded),
-        ],
-      Rol.administrador => const [
-          ('Bandeja de solicitudes', 'Etapa 3', Icons.inbox_outlined),
-          ('Asignación de técnicos', 'Etapa 3', Icons.engineering_outlined),
-          ('Cotizaciones', 'Etapa 3', Icons.request_quote_outlined),
-        ],
-      Rol.tecnico => const [
-          ('Órdenes asignadas', 'Etapa 4', Icons.assignment_outlined),
-          ('Evidencias y piezas', 'Etapa 4', Icons.photo_camera_outlined),
-          ('Historial por número de serie', 'Etapa 4', Icons.qr_code_2_rounded),
-        ],
-    };
 
     return Scaffold(
       appBar: AppBar(
@@ -57,47 +40,7 @@ class HomeScreen extends ConsumerWidget {
           const SizedBox(width: 8),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(color: c.hero, borderRadius: BorderRadius.circular(26)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                StatusPill(usuario.rol.etiqueta),
-                const SizedBox(height: 14),
-                Text(
-                  'Hola, ${usuario.primerNombre}',
-                  style: tema.textTheme.headlineMedium?.copyWith(color: c.heroForeground),
-                ),
-                const SizedBox(height: 6),
-                Text(usuario.correo, style: tema.textTheme.bodyMedium?.copyWith(color: c.heroMuted)),
-              ],
-            ),
-          ),
-          const SizedBox(height: 22),
-          const SectionLabel('Próximamente'),
-          for (final (titulo, etapa, icono) in modulos)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Card(
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                  leading: Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(color: c.tealBg, borderRadius: BorderRadius.circular(14)),
-                    child: Icon(icono, color: c.tealFg, size: 20),
-                  ),
-                  title: Text(titulo, style: tema.textTheme.titleMedium?.copyWith(fontSize: 14)),
-                  trailing: StatusPill(etapa, tono: PillTone.blue),
-                ),
-              ),
-            ),
-        ],
-      ),
+      body: usuario.rol == Rol.cliente ? ClienteHome(usuario: usuario) : _PersonalHome(usuario: usuario),
     );
   }
 
@@ -119,4 +62,91 @@ class HomeScreen extends ConsumerWidget {
     );
     if (confirmar == true) await ref.read(sessionProvider.notifier).cerrarSesion();
   }
+}
+
+/// Panel provisional de técnico y administrador: por ahora la consulta de equipos por número de serie.
+/// Las etapas 3 y 4 agregan la bandeja de solicitudes y las órdenes de trabajo.
+class _PersonalHome extends StatelessWidget {
+  const _PersonalHome({required this.usuario});
+
+  final Usuario usuario;
+
+  @override
+  Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+    final c = context.acColors;
+    final proximos = usuario.rol == Rol.administrador
+        ? const [
+            ('Bandeja de solicitudes', 'Etapa 3', Icons.inbox_outlined),
+            ('Asignación de técnicos', 'Etapa 3', Icons.engineering_outlined),
+            ('Cotizaciones', 'Etapa 3', Icons.request_quote_outlined),
+          ]
+        : const [
+            ('Órdenes asignadas', 'Etapa 4', Icons.assignment_outlined),
+            ('Evidencias y piezas', 'Etapa 4', Icons.photo_camera_outlined),
+          ];
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+      children: [
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(color: c.hero, borderRadius: BorderRadius.circular(26)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              StatusPill(usuario.rol.etiqueta),
+              const SizedBox(height: 14),
+              Text('Hola, ${usuario.primerNombre}', style: tema.textTheme.headlineMedium?.copyWith(color: c.heroForeground)),
+              const SizedBox(height: 6),
+              Text(usuario.correo, style: tema.textTheme.bodyMedium?.copyWith(color: c.heroMuted)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 22),
+        const SectionLabel('Herramientas'),
+        Card(
+          child: ListTile(
+            key: const Key('accion-buscar-serie'),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            leading: _IconoModulo(icono: Icons.qr_code_2_rounded, fondo: c.tealBg, frente: c.tealFg),
+            title: Text('Historial por número de serie', style: tema.textTheme.titleMedium?.copyWith(fontSize: 14)),
+            subtitle: Text('Consulta la ficha técnica y la línea de tiempo de cualquier equipo.', style: tema.textTheme.bodySmall),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () => context.push(Rutas.buscarEquipo),
+          ),
+        ),
+        const SizedBox(height: 22),
+        const SectionLabel('Próximamente'),
+        for (final (titulo, etapa, icono) in proximos)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Card(
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                leading: _IconoModulo(icono: icono, fondo: c.tealBg, frente: c.tealFg),
+                title: Text(titulo, style: tema.textTheme.titleMedium?.copyWith(fontSize: 14)),
+                trailing: StatusPill(etapa, tono: PillTone.blue),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _IconoModulo extends StatelessWidget {
+  const _IconoModulo({required this.icono, required this.fondo, required this.frente});
+
+  final IconData icono;
+  final Color fondo;
+  final Color frente;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: 42,
+        height: 42,
+        decoration: BoxDecoration(color: fondo, borderRadius: BorderRadius.circular(14)),
+        child: Icon(icono, color: frente, size: 20),
+      );
 }

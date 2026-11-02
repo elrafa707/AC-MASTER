@@ -106,6 +106,7 @@ CREATE TABLE dbo.Diagnosticos (
     CostoMin         DECIMAL(10,2)  NOT NULL,
     CostoMax         DECIMAL(10,2)  NOT NULL,
     Advertencia      NVARCHAR(400)  NULL,
+    AnalisisFoto     NVARCHAR(600)  NULL,
     ModeloIA         NVARCHAR(60)   NOT NULL,
     RespuestaIA      NVARCHAR(MAX)  NULL CONSTRAINT CK_Diagnosticos_RespuestaIA CHECK (RespuestaIA IS NULL OR ISJSON(RespuestaIA) = 1),
     Resultado        VARCHAR(20)    NOT NULL CONSTRAINT DF_Diagnosticos_Resultado DEFAULT ('PENDIENTE')
@@ -293,4 +294,11 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Historial_Equipo')
     CREATE INDEX IX_Historial_Equipo ON dbo.HistorialEquipo (EquipoId, Fecha DESC);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Notificaciones_Usuario')
     CREATE INDEX IX_Notificaciones_Usuario ON dbo.Notificaciones (UsuarioId, Leida, Fecha DESC);
+GO
+
+/* ───────────────────────────── Cambios posteriores (bases ya creadas) ───────────────────────────── */
+
+-- Etapa 2: lo que el asistente observó en las fotos.
+IF COL_LENGTH(N'dbo.Diagnosticos', N'AnalisisFoto') IS NULL
+    ALTER TABLE dbo.Diagnosticos ADD AnalisisFoto NVARCHAR(600) NULL;
 GO

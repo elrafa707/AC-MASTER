@@ -1,0 +1,88 @@
+{
+  "id": 13,
+  "equipoId": 17,
+  "clienteId": 3,
+  "sintomas": [
+    "NO_ENFRIA"
+  ],
+  "respuestas": [
+    {
+      "pregunta": "¿El control está en modo frío (copo de nieve) y a menos de 24 °C?",
+      "respuesta": "Sí"
+    },
+    {
+      "pregunta": "¿Sale aire por la unidad interior?",
+      "respuesta": "Sí, pero muy débil"
+    },
+    {
+      "pregunta": "¿Gira el ventilador de la unidad exterior?",
+      "respuesta": "Sí"
+    },
+    {
+      "pregunta": "¿Ves hielo o escarcha en las tuberías o en la unidad interior?",
+      "respuesta": "No"
+    },
+    {
+      "pregunta": "¿Cuándo se limpiaron los filtros por última vez?",
+      "respuesta": "Hace más de 6 meses"
+    },
+    {
+      "pregunta": "¿Desde cuándo notas la falla?",
+      "respuesta": "Hoy"
+    }
+  ],
+  "falla": "Filtros saturados de polvo",
+  "descripcion": "Los filtros sucios no dejan pasar el aire y el equipo pierde capacidad de enfriar.",
+  "confianza": 0.7,
+  "causas": [
+    {
+      "nombre": "Filtros saturados de polvo",
+      "probabilidad": 0.7
+    }
+  ],
+  "requiereTecnico": false,
+  "pasosAutoayuda": [
+    {
+      "titulo": "Apaga y desconecta el equipo",
+      "detalle": "Apágalo con el control y baja su interruptor en el centro de carga."
+    },
+    {
+      "titulo": "Retira los filtros",
+      "detalle": "Levanta la tapa frontal de la unidad interior y desliza los filtros hacia abajo."
+    },
+    {
+      "titulo": "Lávalos con agua",
+      "detalle": "Usa agua tibia y jabón neutro; no uses cepillos duros."
+    },
+    {
+      "titulo": "Déjalos secar y colócalos",
+      "detalle": "Espera a que estén completamente secos antes de reinstalarlos."
+    },
+    {
+      "titulo": "Enciende y espera 20 minutos",
+      "detalle": "Ponlo en modo frío a 22 °C y revisa si enfría mejor."
+    }
+  ],
+  "herramientas": [
+    "Hidrolavadora",
+    "Químico desincrustante"
+  ],
+  "especialidad": {
+    "clave": "MANTENIMIENTO",
+    "nombre": "Mantenimiento"
+  },
+  "prioridad": "baja",
+  "costoMin": 450,
+  "costoMax": 900,
+  "advertencia": null,
+  "analisisFoto": "Modo simulado: las fotos se guardaron, pero no se analizaron.",
+  "modelo": "simulado-reglas",
+  "resultado": "PENDIENTE",
+  "fechaCreacion": "2026-11-02T02:26:12.000Z",
+  "fotos": [
+    {
+      "id": 5,
+      "url": "/api/v1/fotos/5"
+    }
+  ]
+}

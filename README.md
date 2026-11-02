@@ -14,7 +14,8 @@ Conecta a clientes, técnicos y administradores, y un asistente con IA ayuda a d
 ## Requisitos
 - Docker Desktop
 - Node.js 20 o superior
-- Flutter 3.38 o superior y Android Studio (con un emulador o un teléfono con depuración USB)
+- Flutter 3.47 o superior y Android Studio (con un emulador o un teléfono con depuración USB)
+- Una clave de la API de Anthropic para el asistente de diagnóstico (opcional; sin ella funciona en modo simulado)
 
 ## Cómo levantar el proyecto
 
@@ -36,6 +37,14 @@ Para comprobar que responde: `http://localhost:3000/health` debe regresar `{"est
 
 Si quieres crear un administrador real en lugar de la cuenta de prueba: `npm run crear-admin`.
 
+#### Asistente de diagnóstico (Claude)
+El asistente analiza los síntomas, el cuestionario y las fotos del compresor con Claude (`claude-opus-5-5`).
+1. Crea una clave en https://console.anthropic.com (cada integrante usa la suya).
+2. Pégala en `backend/.env` → `ANTHROPIC_API_KEY=sk-ant-...`. **Nunca la subas al repositorio** (`.env` ya está en `.gitignore`).
+3. Reinicia el backend. Al arrancar debe decir `Asistente de diagnóstico: Claude (claude-opus-5-5)`.
+
+Sin clave, el backend arranca en **modo simulado**: usa reglas locales, no analiza las fotos y la app muestra la etiqueta "Modo simulado" en el resultado. Sirve para desarrollar y probar sin gastar.
+
 ### 3. App móvil
 ```bash
 cd mobile
@@ -53,9 +62,15 @@ Las tres usan la contraseña `AcMaster2026!`.
 | Técnico | tecnico@acmaster.mx |
 | Cliente | cliente@acmaster.mx |
 
+## Qué incluye cada etapa
+| Etapa | Contenido |
+|---|---|
+| 1. Infraestructura | SQL Server en Docker, esquema completo, inicio de sesión y registro (RF-01) |
+| 2. Diagnóstico con IA | Registro de equipos, cuestionario inteligente, fotos, diagnóstico con Claude, guía de autoayuda e historial por número de serie (RF-02, RF-03, RF-08) |
+
 ## Pruebas
 ```bash
-cd backend && npm test        # integración; requiere la base de datos corriendo
+cd backend && npm test        # integración; requiere la base de datos corriendo. Usa el asistente simulado (no gasta)
 cd mobile && flutter test
 ```
 

@@ -209,14 +209,19 @@ class _Decision extends StatelessWidget {
                 child: Text(d.requiereTecnico ? 'Ver qué puedo revisar mientras' : 'Seguir la guía paso a paso'),
               ),
             const SizedBox(height: 8),
-            // Etapa 3: aquí se crea la solicitud de servicio con este diagnóstico.
-            OutlinedButton(
-              key: const Key('boton-solicitar-tecnico'),
-              onPressed: null,
-              child: Text(d.requiereTecnico ? 'Solicitar técnico' : 'Prefiero que venga un técnico'),
-            ),
-            const SizedBox(height: 4),
-            Text('La solicitud de técnico se habilita en la siguiente etapa.', textAlign: TextAlign.center, style: tema.textTheme.bodySmall),
+            // El cliente siempre puede pedir técnico, aunque el asistente sugiera autoayuda.
+            if (d.requiereTecnico)
+              FilledButton(
+                key: const Key('boton-solicitar-tecnico'),
+                onPressed: () => context.push(Rutas.solicitarTecnico, extra: d),
+                child: const Text('Solicitar técnico'),
+              )
+            else
+              OutlinedButton(
+                key: const Key('boton-solicitar-tecnico'),
+                onPressed: () => context.push(Rutas.solicitarTecnico, extra: d),
+                child: const Text('Prefiero que venga un técnico'),
+              ),
           ],
         ),
       ),

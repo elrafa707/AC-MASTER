@@ -1,0 +1,12 @@
+[
+  {
+    "id": 8,
+    "alias": "Casa",
+    "calle": "Av. Universidad 1500",
+    "colonia": "Ciudad Universitaria",
+    "ciudad": "San Nicolás de los Garza",
+    "cp": "66455",
+    "referencias": null,
+    "principal": true
+  }
+]

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { after, before, describe, test } from 'node:test';
 import request from 'supertest';
 
-import { crearApp, db } from './helpers.js';
+import { crearApp, db, limpiarDatosDePrueba } from './helpers.js';
 
 const { cerrarPool, consulta, sql } = db;
 
@@ -17,9 +17,7 @@ describe('Autenticación (RF-01)', () => {
   });
 
   after(async () => {
-    await consulta('DELETE FROM dbo.Usuarios WHERE Correo LIKE @patron', {
-      patron: [sql.NVarChar(160), '%@acmaster.test'],
-    });
+    await limpiarDatosDePrueba();
     await cerrarPool();
   });
 

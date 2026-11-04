@@ -1,0 +1,17 @@
+[
+  {
+    "id": 2,
+    "nombre": "Mariela Ríos",
+    "correo": "tecnico@acmaster.mx",
+    "telefono": "8110000002",
+    "activo": true,
+    "disponible": true,
+    "calificacion": 4.9,
+    "especialidades": [
+      "MANTENIMIENTO",
+      "REFRIGERACION"
+    ],
+    "serviciosActivos": 0,
+    "serviciosFinalizados": 0
+  }
+]

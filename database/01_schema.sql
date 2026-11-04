@@ -302,3 +302,15 @@ GO
 IF COL_LENGTH(N'dbo.Diagnosticos', N'AnalisisFoto') IS NULL
     ALTER TABLE dbo.Diagnosticos ADD AnalisisFoto NVARCHAR(600) NULL;
 GO
+
+-- Etapa 3: motivo que da el cliente al rechazar una cotización.
+IF COL_LENGTH(N'dbo.Cotizaciones', N'ComentarioCliente') IS NULL
+    ALTER TABLE dbo.Cotizaciones ADD ComentarioCliente NVARCHAR(400) NULL;
+GO
+
+-- Etapa 4: calificación que da el cliente al técnico al terminar el servicio.
+IF COL_LENGTH(N'dbo.Solicitudes', N'Calificacion') IS NULL
+    ALTER TABLE dbo.Solicitudes ADD
+        Calificacion TINYINT NULL CONSTRAINT CK_Solicitudes_Calificacion CHECK (Calificacion BETWEEN 1 AND 5),
+        ComentarioCalificacion NVARCHAR(400) NULL;
+GO

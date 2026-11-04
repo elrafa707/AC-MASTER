@@ -5,11 +5,12 @@ import 'package:go_router/go_router.dart';
 import '../../core/router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/equipos_repository.dart';
+import '../../data/solicitudes_repository.dart';
 import '../../models/equipo.dart';
 import '../../models/usuario.dart';
 import '../../shared/widgets/estado_carga.dart';
 import '../../shared/widgets/section_label.dart';
-import '../../shared/widgets/status_pill.dart';
+import '../../shared/widgets/tarjeta_solicitud.dart';
 
 /// Panel del cliente: acceso al diagnóstico y lista de sus equipos.
 class ClienteHome extends ConsumerWidget {
@@ -20,12 +21,20 @@ class ClienteHome extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final equipos = ref.watch(misEquiposProvider);
+    final solicitudes = ref.watch(misSolicitudesProvider);
+    final activas = solicitudes.value?.where((s) => s.estado.activa).toList() ?? const [];
     final tema = Theme.of(context);
     final c = context.acColors;
     final hayEquipos = equipos.value?.isNotEmpty ?? false;
 
     return RefreshIndicator(
-      onRefresh: () => ref.refresh(misEquiposProvider.future),
+      onRefresh: () async {
+        ref
+          ..invalidate(misSolicitudesProvider)
+          ..invalidate(notificacionesProvider);
+        ref.invalidate(misEquiposProvider);
+        await ref.read(misEquiposProvider.future);
+      },
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
         children: [
@@ -60,6 +69,11 @@ class ClienteHome extends ConsumerWidget {
               ],
             ),
           ),
+          if (activas.isNotEmpty) ...[
+            const SizedBox(height: 22),
+            SectionLabel('Servicios en curso', accion: 'Ver todos', alPresionar: () => context.push(Rutas.misServicios)),
+            for (final s in activas.take(3)) TarjetaSolicitud(solicitud: s, alTocar: () => context.push(Rutas.solicitud(s.id))),
+          ],
           const SizedBox(height: 22),
           SectionLabel(
             'Mis equipos',
@@ -82,16 +96,14 @@ class ClienteHome extends ConsumerWidget {
             AsyncError(:final error) => ErrorConReintento(error: error, alReintentar: () => ref.invalidate(misEquiposProvider)),
             _ => const Cargando(),
           },
-          const SizedBox(height: 22),
-          const SectionLabel('Próximamente'),
-          Card(
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              leading: Icon(Icons.timeline_rounded, color: c.tealFg),
-              title: Text('Seguimiento de solicitudes y cotizaciones', style: tema.textTheme.titleMedium?.copyWith(fontSize: 14)),
-              trailing: const StatusPill('Etapa 3', tono: PillTone.blue),
+          if ((solicitudes.value ?? const []).length > activas.length) ...[
+            const SizedBox(height: 8),
+            TextButton.icon(
+              onPressed: () => context.push(Rutas.misServicios),
+              icon: const Icon(Icons.history_rounded, size: 18),
+              label: const Text('Ver servicios anteriores'),
             ),
-          ),
+          ],
         ],
       ),
     );

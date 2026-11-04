@@ -1,12 +1,19 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:ac_master/app.dart';
 import 'package:ac_master/core/api/api_exception.dart';
 import 'package:ac_master/core/session/token_storage.dart';
+import 'package:ac_master/data/admin_repository.dart';
 import 'package:ac_master/data/auth_repository.dart';
 import 'package:ac_master/data/diagnosticos_repository.dart';
 import 'package:ac_master/data/equipos_repository.dart';
+import 'package:ac_master/data/solicitudes_repository.dart';
 import 'package:ac_master/features/diagnostico/selector_fotos.dart';
+import 'package:ac_master/models/admin.dart';
 import 'package:ac_master/models/diagnostico.dart';
 import 'package:ac_master/models/equipo.dart';
+import 'package:ac_master/models/solicitud.dart';
 import 'package:ac_master/models/usuario.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
@@ -14,6 +21,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 const clienteDemo = Usuario(id: 3, nombre: 'Rafael Báez', correo: 'cliente@acmaster.mx', rol: Rol.cliente);
 const tecnicoDemo = Usuario(id: 2, nombre: 'Mariela Ríos', correo: 'tecnico@acmaster.mx', rol: Rol.tecnico);
+const adminDemo = Usuario(id: 1, nombre: 'Administrador AC-Master', correo: 'admin@acmaster.mx', rol: Rol.administrador);
 
 class FakeTokenStorage extends TokenStorage {
   FakeTokenStorage([this._token]);
@@ -192,14 +200,160 @@ const pngDemo = [
   0, 0, 73, 69, 78, 68, 174, 66, 96, 130,
 ];
 
+/// Respuestas reales del API capturadas en test/fixtures.
+dynamic fixture(String nombre) => jsonDecode(File('test/fixtures/$nombre.json').readAsStringSync());
+
+class FakeSolicitudesRepository extends SolicitudesRepository {
+  FakeSolicitudesRepository({Solicitud? detalle, List<Direccion>? direcciones})
+      : _detalle = detalle ?? Solicitud.fromJson(fixture('solicitud_cotizada_cliente') as Map<String, dynamic>),
+        _direcciones = direcciones ?? [for (final d in fixture('direcciones') as List) Direccion.fromJson(d as Map<String, dynamic>)],
+        super(Dio());
+
+  Solicitud _detalle;
+  final List<Direccion> _direcciones;
+  final llamadas = <String>[];
+
+  @override
+  Future<List<Direccion>> direcciones() async => List.of(_direcciones);
+
+  @override
+  Future<Direccion> agregarDireccion({
+    required String alias,
+    required String calle,
+    required String colonia,
+    required String ciudad,
+    String? cp,
+    String? referencias,
+  }) async {
+    final d = Direccion(id: 900 + _direcciones.length, alias: alias, calle: calle, colonia: colonia, ciudad: ciudad, cp: cp);
+    _direcciones.add(d);
+    llamadas.add('direccion:$calle');
+    return d;
+  }
+
+  @override
+  Future<Solicitud> crear({required int diagnosticoId, required int direccionId, String? descripcion}) async {
+    llamadas.add('crear:$diagnosticoId:$direccionId');
+    return _detalle;
+  }
+
+  @override
+  Future<List<ResumenSolicitud>> mias() async => [_detalle.resumen];
+
+  @override
+  Future<Solicitud> detalle(int id) async => _detalle;
+
+  @override
+  Future<Solicitud> aprobar(int id) async {
+    llamadas.add('aprobar:$id');
+    return _detalle;
+  }
+
+  @override
+  Future<Solicitud> rechazar(int id, {String? motivo}) async {
+    llamadas.add('rechazar:$id:${motivo ?? ''}');
+    return _detalle;
+  }
+
+  @override
+  Future<Solicitud> cancelar(int id, {String? motivo}) async {
+    llamadas.add('cancelar:$id');
+    return _detalle;
+  }
+
+  set detalleActual(Solicitud s) => _detalle = s;
+
+  @override
+  Future<BandejaNotificaciones> notificaciones() async =>
+      BandejaNotificaciones.fromJson(fixture('notificaciones') as Map<String, dynamic>);
+
+  @override
+  Future<void> marcarLeida(int id) async => llamadas.add('leida:$id');
+
+  @override
+  Future<void> marcarTodasLeidas() async => llamadas.add('leidas');
+}
+
+class FakeAdminRepository extends AdminRepository {
+  FakeAdminRepository() : super(Dio());
+
+  final llamadas = <String>[];
+
+  @override
+  Future<ResumenPanel> resumen() async => const ResumenPanel(
+        enRevision: 3,
+        cotizadas: 1,
+        enCamino: 2,
+        finalizadas: 8,
+        urgentes: 1,
+        tecnicosDisponibles: 2,
+        tecnicosActivos: 3,
+      );
+
+  @override
+  Future<List<ResumenSolicitud>> bandeja({EstadoSolicitud? estado, String? texto}) async => [
+        for (final s in fixture('bandeja_admin') as List) ResumenSolicitud.fromJson(s as Map<String, dynamic>),
+      ];
+
+  @override
+  Future<List<TecnicoRecomendado>> recomendados(int solicitudId) async => [
+        for (final t in fixture('tecnicos_recomendados') as List) TecnicoRecomendado.fromJson(t as Map<String, dynamic>),
+      ];
+
+  Solicitud get _enRevision => Solicitud.fromJson(fixture('solicitud_en_revision_admin') as Map<String, dynamic>);
+
+  @override
+  Future<Solicitud> asignar(int solicitudId, {required int tecnicoId, required DateTime inicio, required DateTime fin}) async {
+    llamadas.add('asignar:$tecnicoId:${fin.difference(inicio).inHours}h');
+    return _enRevision;
+  }
+
+  @override
+  Future<Solicitud> guardarCotizacion(int solicitudId, List<Partida> partidas) async {
+    llamadas.add('cotizacion:${partidas.map((p) => '${p.concepto}=${p.importe.round()}').join('|')}');
+    return _enRevision;
+  }
+
+  @override
+  Future<Solicitud> enviarCotizacion(int solicitudId) async {
+    llamadas.add('enviar:$solicitudId');
+    return _enRevision;
+  }
+
+  @override
+  Future<List<Especialidad>> especialidades() async =>
+      const [Especialidad('ELECTRICO', 'Eléctrico'), Especialidad('REFRIGERACION', 'Refrigeración')];
+
+  @override
+  Future<List<TecnicoCuenta>> tecnicos() async => [
+        for (final t in fixture('tecnicos_admin') as List) TecnicoCuenta.fromJson(t as Map<String, dynamic>),
+      ];
+
+  @override
+  Future<TecnicoCuenta> crearTecnico({
+    required String nombre,
+    required String correo,
+    required String password,
+    required List<String> especialidades,
+    String? telefono,
+  }) async {
+    llamadas.add('tecnico:$correo:${especialidades.join(',')}');
+    return (await tecnicos()).first;
+  }
+}
+
 Widget appDePrueba({
   FakeTokenStorage? tokens,
   FakeAuthRepository? auth,
   FakeEquiposRepository? equipos,
   FakeDiagnosticosRepository? diagnosticos,
+  FakeSolicitudesRepository? solicitudes,
+  FakeAdminRepository? admin,
 }) =>
     ProviderScope(
       overrides: [
+        solicitudesRepositoryProvider.overrideWithValue(solicitudes ?? FakeSolicitudesRepository()),
+        adminRepositoryProvider.overrideWithValue(admin ?? FakeAdminRepository()),
         tokenStorageProvider.overrideWithValue(tokens ?? FakeTokenStorage()),
         authRepositoryProvider.overrideWithValue(auth ?? FakeAuthRepository()),
         equiposRepositoryProvider.overrideWithValue(equipos ?? FakeEquiposRepository()),

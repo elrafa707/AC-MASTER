@@ -12,8 +12,10 @@ const BASE = `
          (SELECT SUM(p.Cantidad * p.PrecioUnitario) FROM dbo.Cotizaciones co
             JOIN dbo.CotizacionPartidas p ON p.CotizacionId = co.CotizacionId
           WHERE co.SolicitudId = s.SolicitudId) AS TotalCotizacion,
-         (SELECT co.Estado FROM dbo.Cotizaciones co WHERE co.SolicitudId = s.SolicitudId) AS EstadoCotizacion
+         (SELECT co.Estado FROM dbo.Cotizaciones co WHERE co.SolicitudId = s.SolicitudId) AS EstadoCotizacion,
+         o.OrdenId, o.Folio AS OrdenFolio, o.DiagnosticoFinal, o.Notas AS OrdenNotas, o.FechaLlegada, o.FechaCierre
   FROM dbo.Solicitudes s
+  LEFT JOIN dbo.OrdenesTrabajo o ON o.SolicitudId = s.SolicitudId
   JOIN dbo.Diagnosticos d ON d.DiagnosticoId = s.DiagnosticoId
   JOIN dbo.Usuarios c ON c.UsuarioId = s.ClienteId
   JOIN dbo.Equipos e ON e.EquipoId = s.EquipoId
@@ -42,8 +44,43 @@ export function aResumenApi(f) {
     ventanaInicio: f.VentanaInicio,
     ventanaFin: f.VentanaFin,
     totalCotizacion: f.TotalCotizacion == null ? null : Number(f.TotalCotizacion),
+    ordenFolio: f.OrdenFolio ?? null,
+    llegada: f.FechaLlegada ?? null,
     fechaCreacion: f.FechaCreacion,
     fechaActualizacion: f.FechaActualizacion,
+  };
+}
+
+/** Evidencias y piezas registradas por el técnico en la orden. */
+export async function orden(f) {
+  if (!f.OrdenId) return null;
+  const [fotos, piezas] = await Promise.all([
+    consulta(`SELECT FotoId FROM dbo.Fotos WHERE OrdenId = @id ORDER BY FotoId`, { id: [sql.Int, f.OrdenId] }),
+    consulta(
+      `SELECT op.PiezaId, p.Codigo, p.Nombre, op.Cantidad, op.PrecioUnitario
+       FROM dbo.OrdenPiezas op JOIN dbo.Piezas p ON p.PiezaId = op.PiezaId
+       WHERE op.OrdenId = @id ORDER BY p.Nombre`,
+      { id: [sql.Int, f.OrdenId] },
+    ),
+  ]);
+  const listaPiezas = piezas.recordset.map((p) => ({
+    piezaId: p.PiezaId,
+    codigo: p.Codigo,
+    nombre: p.Nombre,
+    cantidad: p.Cantidad,
+    precioUnitario: Number(p.PrecioUnitario),
+    importe: p.Cantidad * Number(p.PrecioUnitario),
+  }));
+  return {
+    id: f.OrdenId,
+    folio: f.OrdenFolio,
+    diagnosticoFinal: f.DiagnosticoFinal,
+    notas: f.OrdenNotas,
+    fechaLlegada: f.FechaLlegada,
+    fechaCierre: f.FechaCierre,
+    evidencias: fotos.recordset.map((x) => ({ id: x.FotoId, url: `/api/v1/fotos/${x.FotoId}` })),
+    piezas: listaPiezas,
+    totalPiezas: listaPiezas.reduce((s, p) => s + p.importe, 0),
   };
 }
 
@@ -55,7 +92,8 @@ export async function listar({ clienteId, tecnicoId, estados, prioridad, texto }
     p.clienteId = [sql.Int, clienteId];
   }
   if (tecnicoId) {
-    filtros.push('s.TecnicoId = @tecnicoId');
+    // El técnico ve sus servicios cuando ya hay orden de trabajo (cotización aprobada).
+    filtros.push('s.TecnicoId = @tecnicoId AND o.OrdenId IS NOT NULL');
     p.tecnicoId = [sql.Int, tecnicoId];
   }
   if (estados?.length) {

@@ -67,12 +67,15 @@ diagnosticosRouter.post(
 );
 
 // Las fotos no se publican como archivos estáticos: se sirven después de revisar permisos.
-// TODO(etapa 4): limitar al técnico asignado cuando existan las órdenes de trabajo.
 diagnosticosRouter.get('/fotos/:id', autenticar, validar(esquemaIdRuta, 'params'), async (req, res) => {
   const foto = await diagnosticos.buscarFoto(req.params.id);
-  if (!foto || (req.usuario.rol === 'cliente' && foto.ClienteId !== req.usuario.id)) {
-    throw HttpError.notFound('Foto no encontrada', 'FOTO_NO_ENCONTRADA');
-  }
+  const { rol, id } = req.usuario;
+  const permitido =
+    foto &&
+    (rol === 'administrador' ||
+      (rol === 'cliente' && foto.ClienteId === id) ||
+      (rol === 'tecnico' && foto.TecnicoId === id && ['EN_CAMINO', 'FINALIZADO'].includes(foto.EstadoSolicitud)));
+  if (!permitido) throw HttpError.notFound('Foto no encontrada', 'FOTO_NO_ENCONTRADA');
   res.set('Cache-Control', 'private, max-age=86400');
   res.type(foto.MimeType).sendFile(rutaAbsoluta(foto.Ruta));
 });

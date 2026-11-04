@@ -87,6 +87,8 @@ class _AdminHomeState extends ConsumerState<AdminHome> {
               const SizedBox(width: 10),
               Expanded(child: _Accion(icono: Icons.people_outline_rounded, texto: 'Clientes', alTocar: () => context.push(Rutas.adminClientes))),
               const SizedBox(width: 10),
+              Expanded(child: _Accion(icono: Icons.inventory_2_outlined, texto: 'Piezas', alTocar: () => context.push(Rutas.adminPiezas))),
+              const SizedBox(width: 10),
               Expanded(child: _Accion(icono: Icons.qr_code_2_rounded, texto: 'Por serie', alTocar: () => context.push(Rutas.buscarEquipo))),
             ],
           ),

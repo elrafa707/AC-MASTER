@@ -73,4 +73,23 @@ void main() {
     final tecnicos = [for (final t in _json('tecnicos_admin') as List) TecnicoCuenta.fromJson(t as Map<String, dynamic>)];
     expect(tecnicos.single.especialidades, isNotEmpty);
   });
+
+  test('orden de trabajo: lo que ve el técnico en curso y el cliente al terminar', () {
+    final enCamino = Solicitud.fromJson(_fixture('orden_en_camino_tecnico'));
+    expect(enCamino.estado, EstadoSolicitud.enCamino);
+    expect(enCamino.orden!.folio, startsWith('ORD-'));
+    expect(enCamino.orden!.fechaLlegada, isNotNull);
+    expect(enCamino.clienteTelefono, isNotNull, reason: 'el técnico puede llamar al cliente');
+
+    final finalizada = Solicitud.fromJson(_fixture('solicitud_finalizada_cliente'));
+    expect(finalizada.estado, EstadoSolicitud.finalizado);
+    expect(finalizada.orden!.evidencias, isNotEmpty);
+    expect(finalizada.orden!.totalPiezas, finalizada.orden!.piezas.fold<double>(0, (s, p) => s + p.importe));
+    expect(finalizada.calificacion, isNull);
+
+    final ordenes = [for (final o in _json('ordenes_tecnico') as List) ResumenSolicitud.fromJson(o as Map<String, dynamic>)];
+    expect(ordenes.single.ordenFolio, enCamino.orden!.folio);
+    final piezas = [for (final p in _json('piezas') as List) Pieza.fromJson(p as Map<String, dynamic>)];
+    expect(piezas.every((p) => p.activo), isTrue);
+  });
 }

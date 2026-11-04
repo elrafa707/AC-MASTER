@@ -51,10 +51,11 @@ export async function cargar(usuario, id) {
 export async function detalle(usuario, id) {
   const f = await cargar(usuario, id);
   const esCliente = usuario.rol === 'cliente';
-  const [diagnostico, cotizacion, eventos] = await Promise.all([
+  const [diagnostico, cotizacion, eventos, orden] = await Promise.all([
     diagnosticos.obtener(f.DiagnosticoId),
     repo.cotizacion(f.SolicitudId),
     repo.eventos(f.SolicitudId),
+    repo.orden(f),
   ]);
 
   // El cliente ve al técnico desde que recibe la cotización y su teléfono hasta que la aprueba.
@@ -80,6 +81,8 @@ export async function detalle(usuario, id) {
       : null,
     cotizacion: mostrarCotizacion ? cotizacion : null,
     eventos,
+    // El cliente ve el registro del técnico (diagnóstico final, evidencias y piezas) al terminar el servicio.
+    orden: orden && (!esCliente || f.Estado === 'FINALIZADO') ? orden : null,
     calificacion: f.Calificacion ?? null,
     comentarioCalificacion: f.ComentarioCalificacion ?? null,
   };

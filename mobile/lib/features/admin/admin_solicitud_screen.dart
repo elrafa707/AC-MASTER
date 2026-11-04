@@ -13,6 +13,7 @@ import '../../shared/widgets/estado_carga.dart';
 import '../../shared/widgets/estado_pill.dart';
 import '../../shared/widgets/foto_autenticada.dart';
 import '../../shared/widgets/progreso_solicitud.dart';
+import '../../shared/widgets/resumen_orden.dart';
 import '../../shared/widgets/section_label.dart';
 import '../../shared/widgets/status_pill.dart';
 
@@ -198,6 +199,16 @@ class _Contenido extends ConsumerWidget {
               ),
             ),
           ],
+        ],
+        if (s.orden != null) ...[
+          const SizedBox(height: 18),
+          const SectionLabel('Orden de trabajo'),
+          ResumenOrden(orden: s.orden!),
+          if (s.calificacion != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Row(children: [const Text('Calificación del cliente: '), Estrellas(s.calificacion!)]),
+            ),
         ],
         const SizedBox(height: 18),
         const SectionLabel('Línea de tiempo'),

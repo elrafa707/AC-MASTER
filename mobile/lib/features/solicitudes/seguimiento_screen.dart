@@ -9,7 +9,9 @@ import '../../shared/widgets/dialogos.dart';
 import '../../shared/widgets/estado_carga.dart';
 import '../../shared/widgets/estado_pill.dart';
 import '../../shared/widgets/progreso_solicitud.dart';
+import '../../shared/widgets/resumen_orden.dart';
 import '../../shared/widgets/section_label.dart';
+import 'calificar_servicio.dart';
 
 /// Interfaz 4: seguimiento de la solicitud y respuesta a la cotización (RF-05).
 class SeguimientoScreen extends ConsumerWidget {
@@ -89,6 +91,32 @@ class _Contenido extends ConsumerWidget {
             fondo: c.blueBg,
             frente: c.blueFg,
           ),
+        ],
+        if (s.estado == EstadoSolicitud.enCamino) ...[
+          const SizedBox(height: 12),
+          s.resumen.llegada != null
+              ? _Aviso(
+                  icono: Icons.where_to_vote_rounded,
+                  texto: 'Tu técnico llegó el ${fechaHora(s.resumen.llegada!)}.',
+                  fondo: c.greenBg,
+                  frente: c.greenFg,
+                )
+              : _Aviso(
+                  icono: Icons.directions_car_outlined,
+                  texto: 'Tu visita está confirmada. Te avisaremos cuando el técnico llegue.',
+                  fondo: c.tealBg,
+                  frente: c.tealFg,
+                ),
+        ],
+        if (s.estado == EstadoSolicitud.finalizado) ...[
+          const SizedBox(height: 18),
+          const SectionLabel('Califica el servicio'),
+          CalificarServicio(solicitud: s),
+          if (s.orden != null) ...[
+            const SizedBox(height: 18),
+            const SectionLabel('Resumen del servicio'),
+            ResumenOrden(orden: s.orden!),
+          ],
         ],
         if (s.tecnico != null) ...[
           const SizedBox(height: 18),

@@ -67,12 +67,23 @@ Las tres usan la contraseña `AcMaster2026!`.
 |---|---|
 | 1. Infraestructura | SQL Server en Docker, esquema completo, inicio de sesión y registro (RF-01) |
 | 2. Diagnóstico con IA | Registro de equipos, cuestionario inteligente, fotos, diagnóstico con Claude, guía de autoayuda e historial por número de serie (RF-02, RF-03, RF-08) |
+| 3. Solicitudes y cotizaciones | Solicitar técnico, seguimiento con línea de tiempo, cotización automática que valida el administrador, ranking y asignación de técnicos, gestión de técnicos y clientes, avisos en la app (RF-04, RF-05) |
+| 4. Orden de trabajo | Órdenes del técnico con kit sugerido, llegada, diagnóstico final, evidencias, piezas del catálogo, cierre en el historial del equipo y calificación del técnico (RF-06, RF-07) |
+
+## Probar el flujo completo
+1. **Cliente** (`cliente@acmaster.mx`): registra un equipo, haz un diagnóstico y toca **Solicitar técnico**.
+2. **Administrador** (`admin@acmaster.mx`): abre la solicitud en la bandeja, elige un técnico del ranking, ajusta la cotización y **envíala**.
+3. **Cliente**: en *Servicios en curso*, **aprueba** la cotización.
+4. **Técnico** (`tecnico@acmaster.mx`): abre la orden, marca **Llegué**, escribe el diagnóstico final, sube una foto de evidencia, agrega piezas y **cierra la orden**.
+5. **Cliente**: revisa el resumen del servicio y **califica** al técnico. La reparación aparece en el historial del equipo.
 
 ## Pruebas
 ```bash
 cd backend && npm test        # integración; requiere la base de datos corriendo. Usa el asistente simulado (no gasta)
 cd mobile && flutter test
 ```
+Si cambias la forma de alguna respuesta del API, regenera los JSON que usan las pruebas de la app con
+`cd backend && node scripts/generar-fixtures-app.mjs` (requiere la base de datos corriendo).
 
 ## Flujo de trabajo con Git
 - `main`: versiones entregables.

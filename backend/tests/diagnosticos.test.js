@@ -163,7 +163,8 @@ describe('Equipos, diagnóstico e historial', () => {
       assert.ok(Buffer.from(foto.body).equals(PNG_1X1));
 
       await request(app).get(url).set(auth(tokenOtroCliente)).expect(404);
-      await request(app).get(url).set(auth(tokenTecnico)).expect(200);
+      // Un técnico sin la orden asignada no la ve.
+      await request(app).get(url).set(auth(tokenTecnico)).expect(404);
       await request(app).get(url).expect(401);
     });
 

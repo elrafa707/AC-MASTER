@@ -2,20 +2,20 @@
   "noLeidas": 2,
   "notificaciones": [
     {
-      "id": 69,
-      "solicitudId": 24,
-      "titulo": "Tu cotización AC-000024 está lista",
+      "id": 128,
+      "solicitudId": 41,
+      "titulo": "Tu cotización AC-000041 está lista",
       "cuerpo": "Total $2,000. Revísala y apruébala para agendar la visita.",
       "leida": false,
-      "fecha": "2026-11-04T18:16:37.000Z"
+      "fecha": "2026-11-04T18:24:20.000Z"
     },
     {
-      "id": 67,
-      "solicitudId": 24,
-      "titulo": "Recibimos tu solicitud AC-000024",
+      "id": 126,
+      "solicitudId": 41,
+      "titulo": "Recibimos tu solicitud AC-000041",
       "cuerpo": "Un administrador la revisará, asignará un técnico y te enviará la cotización.",
       "leida": false,
-      "fecha": "2026-11-04T18:16:37.000Z"
+      "fecha": "2026-11-04T18:24:20.000Z"
     }
   ]
 }

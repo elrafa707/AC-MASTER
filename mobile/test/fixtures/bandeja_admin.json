@@ -1,22 +1,24 @@
 [
   {
-    "id": 24,
-    "folio": "AC-000024",
+    "id": 41,
+    "folio": "AC-000041",
     "estado": "COTIZADO",
     "prioridad": "media",
     "falla": "Posible fuga o baja carga de refrigerante",
     "pedidaPorCliente": false,
     "equipo": {
-      "id": 1011,
+      "id": 1019,
       "nombre": "Mirage MRG123"
     },
     "clienteNombre": "Laura Méndez",
     "colonia": "Ciudad Universitaria",
     "tecnicoNombre": "Mariela Ríos",
-    "ventanaInicio": "2026-11-05T20:16:37.000Z",
-    "ventanaFin": "2026-11-05T22:16:37.000Z",
+    "ventanaInicio": "2026-11-05T20:24:20.000Z",
+    "ventanaFin": "2026-11-05T22:24:20.000Z",
     "totalCotizacion": 2000,
-    "fechaCreacion": "2026-11-04T18:16:37.000Z",
-    "fechaActualizacion": "2026-11-04T18:16:37.000Z"
+    "ordenFolio": null,
+    "llegada": null,
+    "fechaCreacion": "2026-11-04T18:24:20.000Z",
+    "fechaActualizacion": "2026-11-04T18:24:20.000Z"
   }
 ]

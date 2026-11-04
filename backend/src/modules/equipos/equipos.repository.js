@@ -108,11 +108,13 @@ export async function crear(q, clienteId, datos) {
   return equipoId;
 }
 
-export async function insertarRegistro(q, { equipoId, tipo, titulo, descripcion, diagnosticoId, fecha }) {
+export async function insertarRegistro(q, { equipoId, tipo, titulo, descripcion, diagnosticoId, solicitudId, tecnicoId, fecha }) {
   await q(
-    `INSERT INTO dbo.HistorialEquipo (EquipoId, Tipo, Titulo, Descripcion, DiagnosticoId, Fecha)
-     VALUES (@equipoId, @tipo, @titulo, @descripcion, @diagnosticoId, COALESCE(@fecha, SYSUTCDATETIME()))`,
+    `INSERT INTO dbo.HistorialEquipo (EquipoId, Tipo, Titulo, Descripcion, DiagnosticoId, SolicitudId, TecnicoId, Fecha)
+     VALUES (@equipoId, @tipo, @titulo, @descripcion, @diagnosticoId, @solicitudId, @tecnicoId, COALESCE(@fecha, SYSUTCDATETIME()))`,
     {
+      solicitudId: [sql.Int, solicitudId ?? null],
+      tecnicoId: [sql.Int, tecnicoId ?? null],
       equipoId: [sql.Int, equipoId],
       tipo: [sql.VarChar(15), tipo],
       titulo: [sql.NVarChar(160), titulo],

@@ -45,6 +45,8 @@ class ResumenSolicitud {
     this.ventanaInicio,
     this.ventanaFin,
     this.totalCotizacion,
+    this.ordenFolio,
+    this.llegada,
   });
 
   final int id;
@@ -62,6 +64,12 @@ class ResumenSolicitud {
   final DateTime? ventanaFin;
   final double? totalCotizacion;
 
+  /// Folio de la orden de trabajo; existe desde que el cliente aprueba la cotización.
+  final String? ordenFolio;
+
+  /// Cuándo marcó el técnico su llegada al domicilio.
+  final DateTime? llegada;
+
   factory ResumenSolicitud.fromJson(Map<String, dynamic> j) => ResumenSolicitud(
         id: j['id'] as int,
         folio: j['folio'] as String,
@@ -77,6 +85,8 @@ class ResumenSolicitud {
         ventanaInicio: _fecha(j['ventanaInicio']),
         ventanaFin: _fecha(j['ventanaFin']),
         totalCotizacion: _numero(j['totalCotizacion']),
+        ordenFolio: j['ordenFolio'] as String?,
+        llegada: _fecha(j['llegada']),
       );
 }
 
@@ -205,6 +215,7 @@ class Solicitud {
     this.descripcion,
     this.tecnico,
     this.cotizacion,
+    this.orden,
     this.calificacion,
     this.comentarioCalificacion,
   });
@@ -221,6 +232,7 @@ class Solicitud {
   final String? descripcion;
   final TecnicoAsignado? tecnico;
   final Cotizacion? cotizacion;
+  final OrdenTrabajo? orden;
   final int? calificacion;
   final String? comentarioCalificacion;
 
@@ -244,10 +256,85 @@ class Solicitud {
       descripcion: j['descripcion'] as String?,
       tecnico: j['tecnico'] == null ? null : TecnicoAsignado.fromJson(j['tecnico'] as Map<String, dynamic>),
       cotizacion: j['cotizacion'] == null ? null : Cotizacion.fromJson(j['cotizacion'] as Map<String, dynamic>),
+      orden: j['orden'] == null ? null : OrdenTrabajo.fromJson(j['orden'] as Map<String, dynamic>),
       calificacion: j['calificacion'] as int?,
       comentarioCalificacion: j['comentarioCalificacion'] as String?,
     );
   }
+}
+
+class PiezaUsada {
+  const PiezaUsada({required this.piezaId, required this.codigo, required this.nombre, required this.cantidad, required this.precioUnitario});
+
+  final int piezaId;
+  final String codigo;
+  final String nombre;
+  final int cantidad;
+  final double precioUnitario;
+
+  double get importe => cantidad * precioUnitario;
+
+  factory PiezaUsada.fromJson(Map<String, dynamic> j) => PiezaUsada(
+        piezaId: j['piezaId'] as int,
+        codigo: j['codigo'] as String,
+        nombre: j['nombre'] as String,
+        cantidad: j['cantidad'] as int,
+        precioUnitario: (j['precioUnitario'] as num).toDouble(),
+      );
+}
+
+/// Registro del técnico en campo (RF-07).
+class OrdenTrabajo {
+  const OrdenTrabajo({
+    required this.folio,
+    required this.evidencias,
+    required this.piezas,
+    required this.totalPiezas,
+    this.diagnosticoFinal,
+    this.notas,
+    this.fechaLlegada,
+    this.fechaCierre,
+  });
+
+  final String folio;
+  final String? diagnosticoFinal;
+  final String? notas;
+  final DateTime? fechaLlegada;
+  final DateTime? fechaCierre;
+
+  /// Pares (id, ruta) de las fotos de evidencia.
+  final List<({int id, String url})> evidencias;
+  final List<PiezaUsada> piezas;
+  final double totalPiezas;
+
+  factory OrdenTrabajo.fromJson(Map<String, dynamic> j) => OrdenTrabajo(
+        folio: j['folio'] as String,
+        diagnosticoFinal: j['diagnosticoFinal'] as String?,
+        notas: j['notas'] as String?,
+        fechaLlegada: _fecha(j['fechaLlegada']),
+        fechaCierre: _fecha(j['fechaCierre']),
+        evidencias: [for (final e in j['evidencias'] as List) (id: e['id'] as int, url: e['url'] as String)],
+        piezas: [for (final p in j['piezas'] as List) PiezaUsada.fromJson(p as Map<String, dynamic>)],
+        totalPiezas: (j['totalPiezas'] as num).toDouble(),
+      );
+}
+
+class Pieza {
+  const Pieza({required this.id, required this.codigo, required this.nombre, required this.precioUnitario, this.activo = true});
+
+  final int id;
+  final String codigo;
+  final String nombre;
+  final double precioUnitario;
+  final bool activo;
+
+  factory Pieza.fromJson(Map<String, dynamic> j) => Pieza(
+        id: j['id'] as int,
+        codigo: j['codigo'] as String,
+        nombre: j['nombre'] as String,
+        precioUnitario: (j['precioUnitario'] as num).toDouble(),
+        activo: j['activo'] as bool? ?? true,
+      );
 }
 
 class Notificacion {

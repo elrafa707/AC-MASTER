@@ -1,12 +1,12 @@
 {
-  "id": 24,
-  "folio": "AC-000024",
+  "id": 41,
+  "folio": "AC-000041",
   "estado": "COTIZADO",
   "prioridad": "media",
   "falla": "Posible fuga o baja carga de refrigerante",
   "pedidaPorCliente": false,
   "equipo": {
-    "id": 1011,
+    "id": 1019,
     "nombre": "Mirage MRG123",
     "numeroSerie": "FIX-SOL-01",
     "tipo": "Minisplit",
@@ -15,20 +15,22 @@
   "clienteNombre": "Laura Méndez",
   "colonia": "Ciudad Universitaria",
   "tecnicoNombre": "Mariela Ríos",
-  "ventanaInicio": "2026-11-05T20:16:37.000Z",
-  "ventanaFin": "2026-11-05T22:16:37.000Z",
+  "ventanaInicio": "2026-11-05T20:24:20.000Z",
+  "ventanaFin": "2026-11-05T22:24:20.000Z",
   "totalCotizacion": 2000,
-  "fechaCreacion": "2026-11-04T18:16:37.000Z",
-  "fechaActualizacion": "2026-11-04T18:16:37.000Z",
+  "ordenFolio": null,
+  "llegada": null,
+  "fechaCreacion": "2026-11-04T18:24:20.000Z",
+  "fechaActualizacion": "2026-11-04T18:24:20.000Z",
   "descripcion": null,
   "cliente": {
-    "id": 2026,
+    "id": 2049,
     "nombre": "Laura Méndez",
     "telefono": "8112345678",
     "correo": "laura.fixture@acmaster.test"
   },
   "direccion": {
-    "id": 8,
+    "id": 14,
     "alias": "Casa",
     "calle": "Av. Universidad 1500",
     "colonia": "Ciudad Universitaria",
@@ -37,9 +39,9 @@
     "referencias": null
   },
   "diagnostico": {
-    "id": 1034,
-    "equipoId": 1011,
-    "clienteId": 2026,
+    "id": 1059,
+    "equipoId": 1019,
+    "clienteId": 2049,
     "sintomas": [
       "NO_ENFRIA"
     ],
@@ -97,7 +99,7 @@
     "analisisFoto": null,
     "modelo": "simulado-reglas",
     "resultado": "ESCALADO",
-    "fechaCreacion": "2026-11-04T18:16:37.000Z",
+    "fechaCreacion": "2026-11-04T18:24:20.000Z",
     "fotos": []
   },
   "tecnico": {
@@ -107,19 +109,19 @@
     "telefono": null
   },
   "cotizacion": {
-    "id": 24,
+    "id": 41,
     "estado": "ENVIADA",
     "generadaAuto": true,
     "partidas": [
       {
-        "id": 53,
+        "id": 91,
         "concepto": "Visita de diagnóstico a domicilio",
         "cantidad": 1,
         "precioUnitario": 350,
         "importe": 350
       },
       {
-        "id": 54,
+        "id": 92,
         "concepto": "Reparación estimada: Posible fuga o baja carga de refrigerante",
         "cantidad": 1,
         "precioUnitario": 1650,
@@ -127,33 +129,34 @@
       }
     ],
     "total": 2000,
-    "fechaEnvio": "2026-11-04T18:16:37.000Z",
+    "fechaEnvio": "2026-11-04T18:24:20.000Z",
     "fechaRespuesta": null,
     "comentarioCliente": null
   },
   "eventos": [
     {
-      "id": 49,
+      "id": 91,
       "estado": "EN_REVISION",
       "titulo": "Solicitud recibida",
       "detalle": "Diagnóstico del asistente: Posible fuga o baja carga de refrigerante",
-      "fecha": "2026-11-04T18:16:37.000Z"
+      "fecha": "2026-11-04T18:24:20.000Z"
     },
     {
-      "id": 50,
+      "id": 92,
       "estado": "EN_REVISION",
       "titulo": "Técnico asignado",
-      "detalle": "Mariela Ríos · jueves, 5 de noviembre, 02:16 p.m. a 04:16 p.m.",
-      "fecha": "2026-11-04T18:16:37.000Z"
+      "detalle": "Mariela Ríos · jueves, 5 de noviembre, 02:24 p.m. a 04:24 p.m.",
+      "fecha": "2026-11-04T18:24:20.000Z"
     },
     {
-      "id": 51,
+      "id": 93,
       "estado": "COTIZADO",
       "titulo": "Cotización enviada",
       "detalle": "Total $2,000",
-      "fecha": "2026-11-04T18:16:37.000Z"
+      "fecha": "2026-11-04T18:24:20.000Z"
     }
   ],
+  "orden": null,
   "calificacion": null,
   "comentarioCalificacion": null
 }

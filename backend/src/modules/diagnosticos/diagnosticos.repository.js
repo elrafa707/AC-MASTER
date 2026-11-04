@@ -101,11 +101,21 @@ export async function marcarResultado(q, id, resultado) {
   });
 }
 
-/** Foto con el dueño del diagnóstico al que pertenece, para validar permisos antes de servirla. */
+/**
+ * Foto con los datos que deciden quién puede verla: el cliente dueño y, si hay solicitud,
+ * el técnico asignado (fotos del diagnóstico y evidencias de su orden).
+ */
 export async function buscarFoto(fotoId) {
   const { recordset } = await consulta(
-    `SELECT f.FotoId, f.Ruta, f.MimeType, d.ClienteId
-     FROM dbo.Fotos f LEFT JOIN dbo.Diagnosticos d ON d.DiagnosticoId = f.DiagnosticoId
+    `SELECT f.FotoId, f.Ruta, f.MimeType,
+            COALESCE(d.ClienteId, so.ClienteId) AS ClienteId,
+            COALESCE(sd.TecnicoId, so.TecnicoId) AS TecnicoId,
+            COALESCE(sd.Estado, so.Estado) AS EstadoSolicitud
+     FROM dbo.Fotos f
+     LEFT JOIN dbo.Diagnosticos d ON d.DiagnosticoId = f.DiagnosticoId
+     LEFT JOIN dbo.Solicitudes sd ON sd.DiagnosticoId = f.DiagnosticoId
+     LEFT JOIN dbo.OrdenesTrabajo o ON o.OrdenId = f.OrdenId
+     LEFT JOIN dbo.Solicitudes so ON so.SolicitudId = o.SolicitudId
      WHERE f.FotoId = @id`,
     { id: [sql.Int, fotoId] },
   );

@@ -43,7 +43,9 @@ export async function limpiarDatosDePrueba() {
      DELETE FROM dbo.Direcciones WHERE UsuarioId IN (${usuarios});
      DELETE FROM dbo.TecnicoEspecialidades WHERE TecnicoId IN (${usuarios});
      DELETE FROM dbo.Tecnicos WHERE TecnicoId IN (${usuarios});
-     DELETE FROM dbo.Usuarios WHERE UsuarioId IN (${usuarios});`,
+     DELETE FROM dbo.Usuarios WHERE UsuarioId IN (${usuarios});
+     DELETE FROM dbo.OrdenPiezas WHERE PiezaId IN (SELECT PiezaId FROM dbo.Piezas WHERE Codigo LIKE 'TST-%');
+     DELETE FROM dbo.Piezas WHERE Codigo LIKE 'TST-%';`,
     { patron: [sql.NVarChar(160), `%${DOMINIO_PRUEBAS}`] },
   );
 }

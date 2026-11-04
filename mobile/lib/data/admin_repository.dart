@@ -90,6 +90,21 @@ class AdminRepository {
   Future<void> cambiarEstadoCliente(int id, {required bool activo}) =>
       llamarApi(() => _dio.patch<void>('/admin/clientes/$id', data: {'activo': activo}));
 
+  Future<List<Pieza>> piezas() => llamarApi(() async {
+        final res = await _dio.get<List<dynamic>>('/admin/piezas');
+        return [for (final p in res.data!) Pieza.fromJson(p as Json)];
+      });
+
+  Future<Pieza> crearPieza({required String codigo, required String nombre, required double precio}) => llamarApi(() async {
+        final res = await _dio.post<Json>('/admin/piezas', data: {'codigo': codigo, 'nombre': nombre, 'precioUnitario': precio});
+        return Pieza.fromJson(res.data!);
+      });
+
+  Future<Pieza> editarPieza(int id, {String? nombre, double? precio, bool? activo}) => llamarApi(() async {
+        final res = await _dio.patch<Json>('/admin/piezas/$id', data: {'nombre': ?nombre, 'precioUnitario': ?precio, 'activo': ?activo});
+        return Pieza.fromJson(res.data!);
+      });
+
   Future<Solicitud> _solicitud(Future<Response<Json>> Function() peticion) => llamarApi(() async {
         final res = await peticion();
         return Solicitud.fromJson(res.data!);
@@ -107,6 +122,8 @@ final tecnicosProvider = FutureProvider<List<TecnicoCuenta>>((ref) {
   ref.watch(sessionProvider.select((s) => s.value?.id));
   return ref.watch(adminRepositoryProvider).tecnicos();
 });
+
+final piezasAdminProvider = FutureProvider<List<Pieza>>((ref) => ref.watch(adminRepositoryProvider).piezas());
 
 final especialidadesProvider = FutureProvider<List<Especialidad>>((ref) => ref.watch(adminRepositoryProvider).especialidades());
 

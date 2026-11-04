@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/admin/admin_solicitud_screen.dart';
 import '../features/admin/clientes_screen.dart';
+import '../features/admin/piezas_screen.dart';
 import '../features/admin/tecnicos_screen.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/session_controller.dart';
@@ -18,6 +19,7 @@ import '../features/notificaciones/notificaciones_screen.dart';
 import '../features/solicitudes/mis_servicios_screen.dart';
 import '../features/solicitudes/seguimiento_screen.dart';
 import '../features/solicitudes/solicitar_tecnico_screen.dart';
+import '../features/tecnico/orden_screen.dart';
 import '../models/diagnostico.dart';
 import '../models/usuario.dart';
 
@@ -34,6 +36,7 @@ abstract final class Rutas {
   static const notificaciones = '/notificaciones';
   static const adminTecnicos = '/admin/tecnicos';
   static const adminClientes = '/admin/clientes';
+  static const adminPiezas = '/admin/piezas';
 
   static String fichaEquipo(int id) => '/equipos/$id';
   static String diagnosticoDe(int equipoId) => '$diagnostico?equipo=$equipoId';
@@ -43,7 +46,7 @@ abstract final class Rutas {
 /// Rutas exclusivas de un rol; el resto solo exige sesión.
 const _soloCliente = {Rutas.nuevoEquipo, Rutas.diagnostico, Rutas.autoayuda, Rutas.solicitarTecnico, Rutas.misServicios};
 const _soloPersonal = {Rutas.buscarEquipo};
-const _soloAdmin = {Rutas.adminTecnicos, Rutas.adminClientes};
+const _soloAdmin = {Rutas.adminTecnicos, Rutas.adminClientes, Rutas.adminPiezas};
 
 final routerProvider = Provider<GoRouter>((ref) {
   // Avisa a go_router que vuelva a evaluar redirect cada vez que cambia la sesión.
@@ -103,14 +106,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         redirect: (_, state) => int.tryParse(state.pathParameters['id']!) == null ? Rutas.inicio : null,
         builder: (_, state) {
           final id = int.parse(state.pathParameters['id']!);
-          return ref.read(sessionProvider).value?.rol == Rol.administrador
-              ? AdminSolicitudScreen(solicitudId: id)
-              : SeguimientoScreen(solicitudId: id);
+          return switch (ref.read(sessionProvider).value?.rol) {
+            Rol.administrador => AdminSolicitudScreen(solicitudId: id),
+            Rol.tecnico => OrdenScreen(solicitudId: id),
+            _ => SeguimientoScreen(solicitudId: id),
+          };
         },
       ),
       GoRoute(path: Rutas.notificaciones, builder: (_, _) => const NotificacionesScreen()),
       GoRoute(path: Rutas.adminTecnicos, builder: (_, _) => const TecnicosScreen()),
       GoRoute(path: Rutas.adminClientes, builder: (_, _) => const ClientesScreen()),
+      GoRoute(path: Rutas.adminPiezas, builder: (_, _) => const PiezasScreen()),
     ],
   );
   ref.onDispose(router.dispose);

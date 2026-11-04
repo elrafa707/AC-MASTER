@@ -9,6 +9,7 @@ import 'package:ac_master/data/auth_repository.dart';
 import 'package:ac_master/data/diagnosticos_repository.dart';
 import 'package:ac_master/data/equipos_repository.dart';
 import 'package:ac_master/data/solicitudes_repository.dart';
+import 'package:ac_master/data/tecnico_repository.dart';
 import 'package:ac_master/features/diagnostico/selector_fotos.dart';
 import 'package:ac_master/models/admin.dart';
 import 'package:ac_master/models/diagnostico.dart';
@@ -264,6 +265,12 @@ class FakeSolicitudesRepository extends SolicitudesRepository {
   set detalleActual(Solicitud s) => _detalle = s;
 
   @override
+  Future<Solicitud> calificar(int id, {required int calificacion, String? comentario}) async {
+    llamadas.add('calificar:$id:$calificacion');
+    return _detalle;
+  }
+
+  @override
   Future<BandejaNotificaciones> notificaciones() async =>
       BandejaNotificaciones.fromJson(fixture('notificaciones') as Map<String, dynamic>);
 
@@ -342,6 +349,59 @@ class FakeAdminRepository extends AdminRepository {
   }
 }
 
+class FakeTecnicoRepository extends TecnicoRepository {
+  FakeTecnicoRepository() : super(Dio());
+
+  final llamadas = <String>[];
+  bool _disponible = true;
+
+  @override
+  Future<List<ResumenSolicitud>> ordenes({bool finalizadas = false}) async => finalizadas
+      ? const []
+      : [for (final o in fixture('ordenes_tecnico') as List) ResumenSolicitud.fromJson(o as Map<String, dynamic>)];
+
+  @override
+  Future<bool> disponible() async => _disponible;
+
+  @override
+  Future<void> cambiarDisponibilidad(bool disponible) async {
+    _disponible = disponible;
+    llamadas.add('disponible:$disponible');
+  }
+
+  Solicitud get _orden => Solicitud.fromJson(fixture('orden_en_camino_tecnico') as Map<String, dynamic>);
+
+  @override
+  Future<Solicitud> registrarLlegada(int id) async => _orden;
+
+  @override
+  Future<Solicitud> guardarRegistro(int id, {String? diagnosticoFinal, String? notas}) async {
+    llamadas.add('registro:${diagnosticoFinal ?? ''}');
+    return _orden;
+  }
+
+  @override
+  Future<Solicitud> subirEvidencias(int id, List<FotoSeleccionada> fotos) async {
+    llamadas.add('evidencias:${fotos.length}');
+    return _orden;
+  }
+
+  @override
+  Future<Solicitud> guardarPiezas(int id, List<({int piezaId, int cantidad})> piezas) async {
+    llamadas.add('piezas:${piezas.map((p) => '${p.piezaId}x${p.cantidad}').join(',')}');
+    return _orden;
+  }
+
+  @override
+  Future<Solicitud> cerrar(int id) async {
+    llamadas.add('cerrar:$id');
+    return _orden;
+  }
+
+  @override
+  Future<List<Pieza>> catalogo() async => [for (final p in fixture('piezas') as List) Pieza.fromJson(p as Map<String, dynamic>)];
+}
+
 Widget appDePrueba({
   FakeTokenStorage? tokens,
   FakeAuthRepository? auth,
@@ -349,9 +409,11 @@ Widget appDePrueba({
   FakeDiagnosticosRepository? diagnosticos,
   FakeSolicitudesRepository? solicitudes,
   FakeAdminRepository? admin,
+  FakeTecnicoRepository? tecnico,
 }) =>
     ProviderScope(
       overrides: [
+        tecnicoRepositoryProvider.overrideWithValue(tecnico ?? FakeTecnicoRepository()),
         solicitudesRepositoryProvider.overrideWithValue(solicitudes ?? FakeSolicitudesRepository()),
         adminRepositoryProvider.overrideWithValue(admin ?? FakeAdminRepository()),
         tokenStorageProvider.overrideWithValue(tokens ?? FakeTokenStorage()),

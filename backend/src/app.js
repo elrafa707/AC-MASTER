@@ -10,6 +10,7 @@ import { diagnosticosRouter } from './modules/diagnosticos/diagnosticos.routes.j
 import { direccionesRouter } from './modules/direcciones/direcciones.routes.js';
 import { equiposRouter } from './modules/equipos/equipos.routes.js';
 import { notificacionesRouter } from './modules/notificaciones/notificaciones.routes.js';
+import { ordenesRouter } from './modules/ordenes/ordenes.routes.js';
 import { solicitudesRouter } from './modules/solicitudes/solicitudes.routes.js';
 import { usuariosRouter } from './modules/usuarios/usuarios.routes.js';
 
@@ -40,6 +41,7 @@ export function crearApp() {
   api.use(solicitudesRouter);
   api.use(adminRouter);
   api.use(notificacionesRouter);
+  api.use(ordenesRouter);
   app.use('/api/v1', api);
 
   app.use(rutaNoEncontrada);

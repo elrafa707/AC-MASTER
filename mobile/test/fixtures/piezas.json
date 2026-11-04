@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "codigo": "INS-AISL-TER",
+    "nombre": "Aislante térmico (1 m)",
+    "precioUnitario": 45,
+    "activo": true
+  },
+  {
+    "id": 7,
+    "codigo": "REP-CAP-35",
+    "nombre": "Capacitor de marcha 35 µF",
+    "precioUnitario": 420,
+    "activo": true
+  },
+  {
+    "id": 8,
+    "codigo": "REP-CAP-45",
+    "nombre": "Capacitor de marcha 45 µF",
+    "precioUnitario": 480,
+    "activo": true
+  },
+  {
+    "id": 9,
+    "codigo": "REP-CAP-FAN",
+    "nombre": "Capacitor de ventilador 2.5 µF",
+    "precioUnitario": 180,
+    "activo": true
+  }
+]

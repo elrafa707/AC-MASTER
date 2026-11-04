@@ -34,6 +34,21 @@ try {
   guardar('bandeja_admin', (await request(app).get('/api/v1/admin/solicitudes').set(a(admin))).body.filter((s) => s.id === sol.id));
   guardar('notificaciones', (await request(app).get('/api/v1/notificaciones').set(a(cli))).body);
   guardar('tecnicos_admin', [mariela]);
+
+  // Etapa 4: la orden del técnico en curso y el servicio terminado visto por el cliente.
+  await request(app).post(`/api/v1/solicitudes/${sol.id}/cotizacion/aprobar`).set(a(cli));
+  const tec = await login('tecnico@acmaster.mx', 'AcMaster2026!');
+  await request(app).post(`/api/v1/tecnico/ordenes/${sol.id}/llegada`).set(a(tec));
+  const catalogo = (await request(app).get('/api/v1/piezas').set(a(tec))).body;
+  guardar('piezas', catalogo.slice(0, 4));
+  guardar('ordenes_tecnico', (await request(app).get('/api/v1/tecnico/ordenes').set(a(tec))).body.filter((o) => o.id === sol.id));
+  guardar('orden_en_camino_tecnico', (await request(app).get(`/api/v1/tecnico/ordenes/${sol.id}`).set(a(tec))).body);
+  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64');
+  await request(app).patch(`/api/v1/tecnico/ordenes/${sol.id}`).set(a(tec)).send({ diagnosticoFinal: 'Fuga en la conexión de la válvula de servicio; se reparó y se cargó gas.' });
+  await request(app).post(`/api/v1/tecnico/ordenes/${sol.id}/evidencias`).set(a(tec)).attach('fotos', png, { filename: 'evidencia.png', contentType: 'image/png' });
+  await request(app).put(`/api/v1/tecnico/ordenes/${sol.id}/piezas`).set(a(tec)).send({ piezas: [{ piezaId: catalogo[0].id, cantidad: 1 }] });
+  await request(app).post(`/api/v1/tecnico/ordenes/${sol.id}/cerrar`).set(a(tec));
+  guardar('solicitud_finalizada_cliente', (await request(app).get(`/api/v1/solicitudes/${sol.id}`).set(a(cli))).body);
   console.log('fixtures listos');
 } finally {
   await limpiarDatosDePrueba();

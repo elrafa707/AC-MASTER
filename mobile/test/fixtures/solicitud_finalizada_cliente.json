@@ -1,0 +1,207 @@
+{
+  "id": 41,
+  "folio": "AC-000041",
+  "estado": "FINALIZADO",
+  "prioridad": "media",
+  "falla": "Posible fuga o baja carga de refrigerante",
+  "pedidaPorCliente": false,
+  "equipo": {
+    "id": 1019,
+    "nombre": "Mirage MRG123",
+    "numeroSerie": "FIX-SOL-01",
+    "tipo": "Minisplit",
+    "ubicacion": null
+  },
+  "clienteNombre": "Laura Méndez",
+  "colonia": "Ciudad Universitaria",
+  "tecnicoNombre": "Mariela Ríos",
+  "ventanaInicio": "2026-11-05T20:24:20.000Z",
+  "ventanaFin": "2026-11-05T22:24:20.000Z",
+  "totalCotizacion": 2000,
+  "ordenFolio": "ORD-000008",
+  "llegada": "2026-11-04T18:24:21.000Z",
+  "fechaCreacion": "2026-11-04T18:24:20.000Z",
+  "fechaActualizacion": "2026-11-04T18:24:21.000Z",
+  "descripcion": null,
+  "cliente": {
+    "id": 2049,
+    "nombre": "Laura Méndez",
+    "telefono": "8112345678",
+    "correo": "laura.fixture@acmaster.test"
+  },
+  "direccion": {
+    "id": 14,
+    "alias": "Casa",
+    "calle": "Av. Universidad 1500",
+    "colonia": "Ciudad Universitaria",
+    "ciudad": "San Nicolás de los Garza",
+    "cp": "66455",
+    "referencias": null
+  },
+  "diagnostico": {
+    "id": 1059,
+    "equipoId": 1019,
+    "clienteId": 2049,
+    "sintomas": [
+      "NO_ENFRIA"
+    ],
+    "respuestas": [
+      {
+        "pregunta": "¿El control está en modo frío (copo de nieve) y a menos de 24 °C?",
+        "respuesta": "Sí"
+      },
+      {
+        "pregunta": "¿Sale aire por la unidad interior?",
+        "respuesta": "Sí, con fuerza"
+      },
+      {
+        "pregunta": "¿Gira el ventilador de la unidad exterior?",
+        "respuesta": "Sí"
+      },
+      {
+        "pregunta": "¿Ves hielo o escarcha en las tuberías o en la unidad interior?",
+        "respuesta": "Sí"
+      },
+      {
+        "pregunta": "¿Cuándo se limpiaron los filtros por última vez?",
+        "respuesta": "Hace menos de 3 meses"
+      },
+      {
+        "pregunta": "¿Desde cuándo notas la falla?",
+        "respuesta": "Hoy"
+      }
+    ],
+    "falla": "Posible fuga o baja carga de refrigerante",
+    "descripcion": "El equipo funciona pero el circuito de refrigeración no está enfriando lo suficiente.",
+    "confianza": 0.8,
+    "causas": [
+      {
+        "nombre": "Posible fuga o baja carga de refrigerante",
+        "probabilidad": 0.8
+      }
+    ],
+    "requiereTecnico": true,
+    "pasosAutoayuda": [],
+    "herramientas": [
+      "Manómetros",
+      "Detector de fugas",
+      "Bomba de vacío",
+      "Refrigerante"
+    ],
+    "especialidad": {
+      "clave": "REFRIGERACION",
+      "nombre": "Refrigeración"
+    },
+    "prioridad": "media",
+    "costoMin": 1200,
+    "costoMax": 2800,
+    "advertencia": null,
+    "analisisFoto": null,
+    "modelo": "simulado-reglas",
+    "resultado": "ESCALADO",
+    "fechaCreacion": "2026-11-04T18:24:20.000Z",
+    "fotos": []
+  },
+  "tecnico": {
+    "id": 2,
+    "nombre": "Mariela Ríos",
+    "calificacion": 4.9,
+    "telefono": "8110000002"
+  },
+  "cotizacion": {
+    "id": 41,
+    "estado": "APROBADA",
+    "generadaAuto": true,
+    "partidas": [
+      {
+        "id": 91,
+        "concepto": "Visita de diagnóstico a domicilio",
+        "cantidad": 1,
+        "precioUnitario": 350,
+        "importe": 350
+      },
+      {
+        "id": 92,
+        "concepto": "Reparación estimada: Posible fuga o baja carga de refrigerante",
+        "cantidad": 1,
+        "precioUnitario": 1650,
+        "importe": 1650
+      }
+    ],
+    "total": 2000,
+    "fechaEnvio": "2026-11-04T18:24:20.000Z",
+    "fechaRespuesta": "2026-11-04T18:24:21.000Z",
+    "comentarioCliente": null
+  },
+  "eventos": [
+    {
+      "id": 91,
+      "estado": "EN_REVISION",
+      "titulo": "Solicitud recibida",
+      "detalle": "Diagnóstico del asistente: Posible fuga o baja carga de refrigerante",
+      "fecha": "2026-11-04T18:24:20.000Z"
+    },
+    {
+      "id": 92,
+      "estado": "EN_REVISION",
+      "titulo": "Técnico asignado",
+      "detalle": "Mariela Ríos · jueves, 5 de noviembre, 02:24 p.m. a 04:24 p.m.",
+      "fecha": "2026-11-04T18:24:20.000Z"
+    },
+    {
+      "id": 93,
+      "estado": "COTIZADO",
+      "titulo": "Cotización enviada",
+      "detalle": "Total $2,000",
+      "fecha": "2026-11-04T18:24:20.000Z"
+    },
+    {
+      "id": 94,
+      "estado": "EN_CAMINO",
+      "titulo": "Cotización aprobada",
+      "detalle": "Mariela Ríos te visitará el jueves, 5 de noviembre, 02:24 p.m. a 04:24 p.m.",
+      "fecha": "2026-11-04T18:24:21.000Z"
+    },
+    {
+      "id": 95,
+      "estado": "EN_CAMINO",
+      "titulo": "El técnico llegó",
+      "detalle": "Mariela Ríos",
+      "fecha": "2026-11-04T18:24:21.000Z"
+    },
+    {
+      "id": 96,
+      "estado": "FINALIZADO",
+      "titulo": "Servicio finalizado",
+      "detalle": "Piezas: Aislante térmico (1 m) × 1",
+      "fecha": "2026-11-04T18:24:21.000Z"
+    }
+  ],
+  "orden": {
+    "id": 8,
+    "folio": "ORD-000008",
+    "diagnosticoFinal": "Fuga en la conexión de la válvula de servicio; se reparó y se cargó gas.",
+    "notas": null,
+    "fechaLlegada": "2026-11-04T18:24:21.000Z",
+    "fechaCierre": "2026-11-04T18:24:21.000Z",
+    "evidencias": [
+      {
+        "id": 1012,
+        "url": "/api/v1/fotos/1012"
+      }
+    ],
+    "piezas": [
+      {
+        "piezaId": 1,
+        "codigo": "INS-AISL-TER",
+        "nombre": "Aislante térmico (1 m)",
+        "cantidad": 1,
+        "precioUnitario": 45,
+        "importe": 45
+      }
+    ],
+    "totalPiezas": 45
+  },
+  "calificacion": null,
+  "comentarioCalificacion": null
+}

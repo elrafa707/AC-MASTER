@@ -61,6 +61,13 @@ class SolicitudesRepository {
   Future<Solicitud> cancelar(int id, {String? motivo}) =>
       _solicitud(() => _dio.post<Json>('/solicitudes/$id/cancelar', data: {'motivo': ?motivo}));
 
+  Future<Solicitud> calificar(int id, {required int calificacion, String? comentario}) => _solicitud(
+        () => _dio.post<Json>('/solicitudes/$id/calificar', data: {
+          'calificacion': calificacion,
+          if (comentario != null && comentario.trim().isNotEmpty) 'comentario': comentario.trim(),
+        }),
+      );
+
   Future<BandejaNotificaciones> notificaciones() => llamarApi(() async {
         final res = await _dio.get<Json>('/notificaciones');
         return BandejaNotificaciones.fromJson(res.data!);

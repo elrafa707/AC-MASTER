@@ -61,8 +61,9 @@ class _AutoayudaScreenState extends ConsumerState<AutoayudaScreen> {
           _Estado.noResuelto => _Final(
               icono: Icons.engineering_rounded,
               titulo: 'Te recomendamos un técnico',
-              mensaje: 'Los pasos no bastaron. En la siguiente etapa podrás solicitar la visita directamente desde aquí.',
+              mensaje: 'Los pasos no bastaron. Un técnico puede revisarlo en tu domicilio.',
               equipoId: widget.diagnostico.equipoId,
+              diagnostico: widget.diagnostico,
             ),
           _ => _guia(),
         },
@@ -176,12 +177,15 @@ class _AutoayudaScreenState extends ConsumerState<AutoayudaScreen> {
 }
 
 class _Final extends StatelessWidget {
-  const _Final({required this.icono, required this.titulo, required this.mensaje, required this.equipoId});
+  const _Final({required this.icono, required this.titulo, required this.mensaje, required this.equipoId, this.diagnostico});
 
   final IconData icono;
   final String titulo;
   final String mensaje;
   final int equipoId;
+
+  /// Si viene, se ofrece pedir técnico para este diagnóstico.
+  final Diagnostico? diagnostico;
 
   @override
   Widget build(BuildContext context) {
@@ -199,7 +203,15 @@ class _Final extends StatelessWidget {
             const SizedBox(height: 8),
             Text(mensaje, textAlign: TextAlign.center, style: tema.textTheme.bodyMedium),
             const SizedBox(height: 24),
-            FilledButton(
+            if (diagnostico != null) ...[
+              FilledButton(
+                key: const Key('boton-solicitar-desde-guia'),
+                onPressed: () => context.push(Rutas.solicitarTecnico, extra: diagnostico),
+                child: const Text('Solicitar técnico'),
+              ),
+              const SizedBox(height: 8),
+            ],
+            OutlinedButton(
               key: const Key('boton-ver-historial'),
               onPressed: () => context
                 ..go(Rutas.inicio)

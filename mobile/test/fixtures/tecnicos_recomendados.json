@@ -1,0 +1,21 @@
+[
+  {
+    "id": 2,
+    "nombre": "Mariela Ríos",
+    "especialidades": [
+      "Mantenimiento",
+      "Refrigeración"
+    ],
+    "disponible": true,
+    "calificacion": 4.9,
+    "serviciosActivos": 0,
+    "tieneEspecialidad": true,
+    "puntaje": 100,
+    "asignado": false,
+    "razones": [
+      "Tiene la especialidad de la falla",
+      "Disponible",
+      "Sin servicios activos"
+    ]
+  }
+]

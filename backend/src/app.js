@@ -4,9 +4,13 @@ import helmet from 'helmet';
 import { consulta } from './config/db.js';
 import { env } from './config/env.js';
 import { manejadorErrores, rutaNoEncontrada } from './middlewares/error-handler.js';
+import { adminRouter } from './modules/admin/admin.routes.js';
 import { authRouter } from './modules/auth/auth.routes.js';
 import { diagnosticosRouter } from './modules/diagnosticos/diagnosticos.routes.js';
+import { direccionesRouter } from './modules/direcciones/direcciones.routes.js';
 import { equiposRouter } from './modules/equipos/equipos.routes.js';
+import { notificacionesRouter } from './modules/notificaciones/notificaciones.routes.js';
+import { solicitudesRouter } from './modules/solicitudes/solicitudes.routes.js';
 import { usuariosRouter } from './modules/usuarios/usuarios.routes.js';
 
 export function crearApp() {
@@ -32,6 +36,10 @@ export function crearApp() {
   api.use(usuariosRouter);
   api.use(equiposRouter);
   api.use(diagnosticosRouter);
+  api.use(direccionesRouter);
+  api.use(solicitudesRouter);
+  api.use(adminRouter);
+  api.use(notificacionesRouter);
   app.use('/api/v1', api);
 
   app.use(rutaNoEncontrada);

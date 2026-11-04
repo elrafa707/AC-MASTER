@@ -6,8 +6,10 @@ import '../../core/router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../models/usuario.dart';
 import '../../shared/widgets/brand_mark.dart';
+import '../../shared/widgets/campana.dart';
 import '../../shared/widgets/section_label.dart';
 import '../../shared/widgets/status_pill.dart';
+import '../admin/admin_home.dart';
 import '../auth/session_controller.dart';
 import '../cliente/cliente_home.dart';
 
@@ -31,6 +33,7 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
         actions: [
+          const Campana(),
           IconButton(
             key: const Key('boton-cerrar-sesion'),
             tooltip: 'Cerrar sesión',
@@ -40,7 +43,11 @@ class HomeScreen extends ConsumerWidget {
           const SizedBox(width: 8),
         ],
       ),
-      body: usuario.rol == Rol.cliente ? ClienteHome(usuario: usuario) : _PersonalHome(usuario: usuario),
+      body: switch (usuario.rol) {
+        Rol.cliente => ClienteHome(usuario: usuario),
+        Rol.administrador => AdminHome(usuario: usuario),
+        Rol.tecnico => _PersonalHome(usuario: usuario),
+      },
     );
   }
 
@@ -64,8 +71,8 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-/// Panel provisional de técnico y administrador: por ahora la consulta de equipos por número de serie.
-/// Las etapas 3 y 4 agregan la bandeja de solicitudes y las órdenes de trabajo.
+/// Panel provisional del técnico: por ahora la consulta de equipos por número de serie.
+/// La etapa 4 agrega las órdenes de trabajo.
 class _PersonalHome extends StatelessWidget {
   const _PersonalHome({required this.usuario});
 
@@ -75,16 +82,10 @@ class _PersonalHome extends StatelessWidget {
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
     final c = context.acColors;
-    final proximos = usuario.rol == Rol.administrador
-        ? const [
-            ('Bandeja de solicitudes', 'Etapa 3', Icons.inbox_outlined),
-            ('Asignación de técnicos', 'Etapa 3', Icons.engineering_outlined),
-            ('Cotizaciones', 'Etapa 3', Icons.request_quote_outlined),
-          ]
-        : const [
-            ('Órdenes asignadas', 'Etapa 4', Icons.assignment_outlined),
-            ('Evidencias y piezas', 'Etapa 4', Icons.photo_camera_outlined),
-          ];
+    const proximos = [
+      ('Órdenes asignadas', 'Etapa 4', Icons.assignment_outlined),
+      ('Evidencias y piezas', 'Etapa 4', Icons.photo_camera_outlined),
+    ];
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),

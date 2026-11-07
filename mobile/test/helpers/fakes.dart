@@ -54,6 +54,9 @@ class FakeAuthRepository extends AuthRepository {
     if (correo == clienteDemo.correo && password == 'AcMaster2026!') {
       return (token: 'token-demo', usuario: clienteDemo);
     }
+    if (correo == tecnicoDemo.correo && password == 'AcMaster2026!') {
+      return (token: 'token-tecnico', usuario: tecnicoDemo);
+    }
     throw const ApiException('Correo o contraseña incorrectos', codigo: 'CREDENCIALES_INVALIDAS', status: 401);
   }
 

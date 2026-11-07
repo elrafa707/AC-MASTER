@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api/api_exception.dart';
-import '../../core/theme/app_colors.dart';
+import '../../models/usuario.dart';
 import '../../shared/widgets/brand_mark.dart';
-import '../../shared/widgets/status_pill.dart';
+import '../../shared/widgets/rol_icono.dart';
 import 'session_controller.dart';
 
 /// Interfaz 1: inicio de sesión y registro de clientes (RF-01).
@@ -24,6 +24,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _password = TextEditingController();
 
   bool _registro = false;
+  Rol _perfil = Rol.cliente;
   bool _verPassword = false;
   bool _enviando = false;
   String? _error;
@@ -41,6 +42,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void _cambiarModo() {
     setState(() {
       _registro = !_registro;
+      _perfil = Rol.cliente;
       _error = null;
       _erroresCampo = const {};
     });
@@ -66,7 +68,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           password: _password.text,
         );
       } else {
-        await sesion.iniciarSesion(correo: _correo.text.trim(), password: _password.text);
+        await sesion.iniciarSesion(correo: _correo.text.trim(), password: _password.text, perfil: _perfil);
       }
       // Al cambiar la sesión, el router lleva al usuario a su panel.
     } on ApiException catch (e) {
@@ -95,20 +97,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const _Portada(),
-                  const SizedBox(height: 22),
-                  Text(
-                    _registro ? 'Crear una cuenta' : 'Volver a tu espacio',
-                    style: tema.textTheme.headlineSmall,
-                  ),
+                  const Center(child: LogoCompleto()),
+                  const SizedBox(height: 24),
+                  Text(_registro ? 'Crear una cuenta' : 'Volver a tu espacio', style: tema.textTheme.headlineSmall),
                   const SizedBox(height: 4),
                   Text(
-                    _registro
-                        ? 'Solo necesitaremos unos datos para empezar.'
-                        : 'Tus servicios, reunidos en un solo lugar.',
+                    _registro ? 'Solo necesitaremos unos datos para empezar.' : 'Tus servicios, reunidos en un solo lugar.',
                     style: tema.textTheme.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
                   ),
                   const SizedBox(height: 18),
+                  if (!_registro) ...[
+                    _SelectorPerfil(
+                      perfil: _perfil,
+                      alCambiar: (rol) => setState(() {
+                        _perfil = rol;
+                        _error = null;
+                      }),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
                   Form(
                     key: _formKey,
                     child: AutofillGroup(
@@ -128,8 +135,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 prefixIcon: Icon(Icons.person_outline_rounded),
                               ),
                               forceErrorText: _erroresCampo['nombre'],
-                              validator: (v) =>
-                                  (v == null || v.trim().length < 3) ? 'Escribe tu nombre completo' : null,
+                              validator: (v) => (v == null || v.trim().length < 3) ? 'Escribe tu nombre completo' : null,
                             ),
                             const SizedBox(height: 12),
                           ],
@@ -204,10 +210,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                   ),
-                  if (_error != null) ...[
-                    const SizedBox(height: 14),
-                    _AvisoError(_error!),
-                  ],
+                  if (_error != null) ...[const SizedBox(height: 14), _AvisoError(_error!)],
                   const SizedBox(height: 18),
                   FilledButton(
                     key: const Key('boton-enviar'),
@@ -224,27 +227,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               Text(_registro ? 'Creando tu cuenta…' : 'Validando acceso…'),
                             ],
                           )
-                        : Text(_registro ? 'Crear mi cuenta' : 'Entrar a AC-Master'),
+                        : Text(_registro ? 'Crear mi cuenta' : 'Entrar como ${_perfil.etiqueta.toLowerCase()}'),
                   ),
                   const SizedBox(height: 10),
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Text(
-                        _registro ? '¿Ya tienes cuenta?' : '¿Es tu primera vez?',
-                        style: tema.textTheme.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
-                      ),
-                      TextButton(
-                        key: const Key('boton-cambiar-modo'),
-                        onPressed: _enviando ? null : _cambiarModo,
-                        child: Text(_registro ? 'Iniciar sesión' : 'Crear una cuenta'),
-                      ),
-                    ],
-                  ),
-                  if (!_registro)
+                  if (_registro || _perfil == Rol.cliente)
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          _registro ? '¿Ya tienes cuenta?' : '¿Es tu primera vez?',
+                          style: tema.textTheme.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+                        ),
+                        TextButton(
+                          key: const Key('boton-cambiar-modo'),
+                          onPressed: _enviando ? null : _cambiarModo,
+                          child: Text(_registro ? 'Iniciar sesión' : 'Crear una cuenta'),
+                        ),
+                      ],
+                    ),
+                  if (!_registro && _perfil != Rol.cliente)
                     Text(
-                      'Las cuentas de técnicos las crea el administrador.',
+                      'Las cuentas de técnicos y administradores las crea el administrador de AC-Master.',
                       textAlign: TextAlign.center,
                       style: tema.textTheme.bodySmall,
                     ),
@@ -258,112 +262,56 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 }
 
-class _Portada extends StatelessWidget {
-  const _Portada();
+/// Desplegable para elegir con qué perfil se entra; cada opción lleva su ícono de rol.
+class _SelectorPerfil extends StatelessWidget {
+  const _SelectorPerfil({required this.perfil, required this.alCambiar});
+
+  final Rol perfil;
+  final ValueChanged<Rol> alCambiar;
 
   @override
   Widget build(BuildContext context) {
-    final c = context.acColors;
     final tema = Theme.of(context);
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(26),
-      child: Container(
-        color: c.hero,
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Positioned(right: -70, top: -70, child: _Aro(tamanio: 150, grosor: 18, color: const Color(0x333EC1C3))),
-            Positioned(right: 30, bottom: -90, child: _Aro(tamanio: 130, grosor: 14, color: const Color(0x26F3B27E))),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return DropdownButtonFormField<Rol>(
+      key: const Key('selector-perfil'),
+      initialValue: perfil,
+      isExpanded: true,
+      itemHeight: 64,
+      decoration: InputDecoration(
+        labelText: 'Ingresar como',
+        prefixIcon: Padding(padding: const EdgeInsets.all(8), child: RolIcono(perfil, tamanio: 34)),
+      ),
+      selectedItemBuilder: (_) => [
+        for (final rol in Rol.values) Align(alignment: Alignment.centerLeft, child: Text(rol.etiqueta)),
+      ],
+      items: [
+        for (final rol in Rol.values)
+          DropdownMenuItem(
+            key: Key('perfil-${rol.name}'),
+            value: rol,
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    const BrandMark(),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'AC-Master',
-                        style: tema.textTheme.headlineSmall?.copyWith(color: c.heroForeground, fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                    const StatusPill('24/7 seguimiento'),
-                  ],
-                ),
-                const SizedBox(height: 22),
-                Text(
-                  'Del aviso a la solución.',
-                  style: tema.textTheme.headlineMedium?.copyWith(color: c.heroForeground),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Diagnóstico inteligente, técnico adecuado y cada paso de tu servicio a la vista.',
-                  style: tema.textTheme.bodyMedium?.copyWith(color: c.heroMuted),
-                ),
-                const SizedBox(height: 18),
-                Row(
-                  children: [
-                    _Paso(icono: Icons.assignment_outlined, texto: 'Solicitud', color: c.heroMuted),
-                    _Conector(color: c.heroMuted),
-                    _Paso(icono: Icons.directions_car_outlined, texto: 'Visita', color: c.heroMuted),
-                    _Conector(color: c.heroMuted),
-                    _Paso(icono: Icons.check_circle_outline_rounded, texto: 'Resuelto', color: c.heroMuted),
-                  ],
+                RolIcono(rol, tamanio: 38),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(rol.etiqueta, style: tema.textTheme.titleMedium?.copyWith(fontSize: 14)),
+                      Text(RolIcono.descripcion(rol), style: tema.textTheme.bodySmall, overflow: TextOverflow.ellipsis),
+                    ],
+                  ),
                 ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
+      ],
+      onChanged: (rol) {
+        if (rol != null) alCambiar(rol);
+      },
     );
   }
-}
-
-class _Aro extends StatelessWidget {
-  const _Aro({required this.tamanio, required this.grosor, required this.color});
-
-  final double tamanio;
-  final double grosor;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) => Container(
-        width: tamanio,
-        height: tamanio,
-        decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: color, width: grosor)),
-      );
-}
-
-class _Paso extends StatelessWidget {
-  const _Paso({required this.icono, required this.texto, required this.color});
-
-  final IconData icono;
-  final String texto;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) => Column(
-        children: [
-          Icon(icono, color: color, size: 20),
-          const SizedBox(height: 4),
-          Text(texto, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600)),
-        ],
-      );
-}
-
-class _Conector extends StatelessWidget {
-  const _Conector({required this.color});
-
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) => Expanded(
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 16, left: 6, right: 6),
-          child: Divider(color: color.withValues(alpha: 0.35), thickness: 1),
-        ),
-      );
 }
 
 class _AvisoError extends StatelessWidget {
@@ -387,7 +335,9 @@ class _AvisoError extends StatelessWidget {
         children: [
           Icon(Icons.error_outline_rounded, color: cs.error, size: 18),
           const SizedBox(width: 8),
-          Expanded(child: Text(mensaje, style: TextStyle(color: cs.error, fontSize: 12.5, height: 1.4))),
+          Expanded(
+            child: Text(mensaje, style: TextStyle(color: cs.error, fontSize: 12.5, height: 1.4)),
+          ),
         ],
       ),
     );

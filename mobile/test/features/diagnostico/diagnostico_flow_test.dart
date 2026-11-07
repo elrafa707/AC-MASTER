@@ -35,6 +35,9 @@ void main() {
   }
 
   testWidgets('el cliente sin equipos no puede diagnosticar y se le invita a registrar uno', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 2.6;
+    addTearDown(tester.view.reset);
     await tester.pumpWidget(appDePrueba(tokens: FakeTokenStorage('t'), equipos: FakeEquiposRepository(equipos: [])));
     await tester.pumpAndSettle();
 

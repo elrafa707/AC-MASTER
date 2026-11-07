@@ -8,6 +8,7 @@ import '../../data/tecnico_repository.dart';
 import '../../models/usuario.dart';
 import '../../shared/widgets/dialogos.dart';
 import '../../shared/widgets/estado_carga.dart';
+import '../../shared/widgets/rol_icono.dart';
 import '../../shared/widgets/section_label.dart';
 import '../../shared/widgets/tarjeta_solicitud.dart';
 
@@ -52,30 +53,18 @@ class TecnicoHome extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'RUTA DE HOY · TÉCNICO',
-                    style: TextStyle(
-                      color: c.heroMuted,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Hola, ${usuario.primerNombre}',
-                    style: tema.textTheme.headlineSmall?.copyWith(
-                      color: c.heroForeground,
-                    ),
-                  ),
+                  const EncabezadoRol(rol: Rol.tecnico, titulo: 'Ruta de hoy'),
+                  const SizedBox(height: 14),
+                  Text('Hola, ${usuario.primerNombre}', style: tema.textTheme.headlineSmall?.copyWith(color: c.heroForeground)),
                   const SizedBox(height: 4),
                   Text(
-                    activas.hasValue
-                        ? '${activas.value!.length} órdenes por atender'
-                        : 'Cargando tus órdenes…',
-                    style: tema.textTheme.bodyMedium?.copyWith(
-                      color: c.heroMuted,
-                    ),
+                    switch (activas.value?.length) {
+                    null => 'Cargando tus órdenes…',
+                    0 => 'Sin órdenes por atender',
+                    1 => '1 orden por atender',
+                    final n => '$n órdenes por atender',
+                  },
+                    style: tema.textTheme.bodyMedium?.copyWith(color: c.heroMuted),
                   ),
                   const SizedBox(height: 12),
                   SwitchListTile(
@@ -86,22 +75,15 @@ class TecnicoHome extends ConsumerWidget {
                         ? (v) async {
                             final ok = await ejecutarConAviso(
                               context,
-                              () => ref
-                                  .read(tecnicoRepositoryProvider)
-                                  .cambiarDisponibilidad(v),
-                              exito: v
-                                  ? 'Estás disponible para nuevas órdenes'
-                                  : 'Marcado como ocupado',
+                              () => ref.read(tecnicoRepositoryProvider).cambiarDisponibilidad(v),
+                              exito: v ? 'Estás disponible para nuevas órdenes' : 'Marcado como ocupado',
                             );
                             if (ok) ref.invalidate(disponibilidadProvider);
                           }
                         : null,
                     title: Text(
                       (disponible.value ?? false) ? 'Disponible' : 'Ocupado',
-                      style: TextStyle(
-                        color: c.heroForeground,
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: TextStyle(color: c.heroForeground, fontWeight: FontWeight.w700),
                     ),
                     subtitle: Text(
                       'Los administradores priorizan a los técnicos disponibles.',
@@ -121,14 +103,7 @@ class TecnicoHome extends ConsumerWidget {
               mensaje: 'Cuando un cliente apruebe una cotización asignada a ti, aparecerá aquí.',
             ),
             AsyncData(:final value) => Column(
-              children: [
-                for (final o in value)
-                  TarjetaSolicitud(
-                    solicitud: o,
-                    mostrarCliente: true,
-                    alTocar: () => abrir(o.id),
-                  ),
-              ],
+              children: [for (final o in value) TarjetaSolicitud(solicitud: o, mostrarCliente: true, alTocar: () => abrir(o.id))],
             ),
             AsyncError(:final error) => ErrorConReintento(
               error: error,
@@ -140,15 +115,9 @@ class TecnicoHome extends ConsumerWidget {
           Card(
             child: ListTile(
               key: const Key('accion-buscar-serie'),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 6,
-              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               leading: Icon(Icons.qr_code_2_rounded, color: c.tealFg),
-              title: Text(
-                'Historial por número de serie',
-                style: tema.textTheme.titleMedium?.copyWith(fontSize: 14),
-              ),
+              title: Text('Historial por número de serie', style: tema.textTheme.titleMedium?.copyWith(fontSize: 14)),
               trailing: const Icon(Icons.chevron_right_rounded),
               onTap: () => context.push(Rutas.buscarEquipo),
             ),
@@ -157,11 +126,7 @@ class TecnicoHome extends ConsumerWidget {
             const SizedBox(height: 22),
             const SectionLabel('Terminadas'),
             for (final o in terminadas.value!.take(5))
-              TarjetaSolicitud(
-                solicitud: o,
-                mostrarCliente: true,
-                alTocar: () => abrir(o.id),
-              ),
+              TarjetaSolicitud(solicitud: o, mostrarCliente: true, alTocar: () => abrir(o.id)),
           ],
         ],
       ),

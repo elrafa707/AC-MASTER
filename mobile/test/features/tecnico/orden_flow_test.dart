@@ -36,8 +36,9 @@ void main() {
     await tester.pumpWidget(appTecnico(tecnico));
     await tester.pumpAndSettle();
 
-    expect(find.text('RUTA DE HOY · TÉCNICO'), findsOneWidget);
-    expect(find.text('1 órdenes por atender'), findsOneWidget);
+    expect(find.text('RUTA DE HOY'), findsOneWidget);
+    expect(find.byKey(const Key('rol-icono-tecnico')), findsOneWidget);
+    expect(find.text('1 orden por atender'), findsOneWidget);
     expect(find.byKey(Key('solicitud-${enCamino['id']}')), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('switch-disponible')));

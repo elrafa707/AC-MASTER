@@ -8,6 +8,7 @@ import '../../data/admin_repository.dart';
 import '../../models/solicitud.dart';
 import '../../models/usuario.dart';
 import '../../shared/widgets/estado_carga.dart';
+import '../../shared/widgets/rol_icono.dart';
 import '../../shared/widgets/section_label.dart';
 import '../../shared/widgets/tarjeta_solicitud.dart';
 
@@ -61,8 +62,8 @@ class _AdminHomeState extends ConsumerState<AdminHome> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('CENTRO DE OPERACIONES', style: TextStyle(color: c.heroMuted, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.4)),
-                const SizedBox(height: 8),
+                const EncabezadoRol(rol: Rol.administrador, titulo: 'Centro de operaciones'),
+                const SizedBox(height: 14),
                 Text('Hola, ${widget.usuario.primerNombre}', style: tema.textTheme.headlineSmall?.copyWith(color: c.heroForeground)),
                 const SizedBox(height: 16),
                 Row(

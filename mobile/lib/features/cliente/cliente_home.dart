@@ -9,6 +9,7 @@ import '../../data/solicitudes_repository.dart';
 import '../../models/equipo.dart';
 import '../../models/usuario.dart';
 import '../../shared/widgets/estado_carga.dart';
+import '../../shared/widgets/rol_icono.dart';
 import '../../shared/widgets/section_label.dart';
 import '../../shared/widgets/tarjeta_solicitud.dart';
 
@@ -44,6 +45,8 @@ class ClienteHome extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const EncabezadoRol(rol: Rol.cliente, titulo: 'Tu espacio'),
+                const SizedBox(height: 14),
                 Text('Hola, ${usuario.primerNombre}', style: tema.textTheme.headlineMedium?.copyWith(color: c.heroForeground)),
                 const SizedBox(height: 6),
                 Text(

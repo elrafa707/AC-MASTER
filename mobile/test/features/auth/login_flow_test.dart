@@ -18,7 +18,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Volver a tu espacio'), findsOneWidget);
-    expect(find.text('Entrar a AC-Master'), findsOneWidget);
+    expect(find.text('Entrar como cliente'), findsOneWidget);
+    expect(find.byKey(const Key('logo-completo')), findsOneWidget);
   });
 
   testWidgets('valida el formulario antes de llamar al servidor', (tester) async {
@@ -98,5 +99,63 @@ void main() {
 
     expect(find.text('Volver a tu espacio'), findsOneWidget);
     expect(tokens.actual, isNull);
+  });
+
+  group('Perfil de ingreso', () {
+    setUp(() {
+      final vista = TestWidgetsFlutterBinding.instance.platformDispatcher.views.first;
+      vista.physicalSize = const Size(1080, 2400);
+      vista.devicePixelRatio = 2.6;
+    });
+    tearDown(() => TestWidgetsFlutterBinding.instance.platformDispatcher.views.first.reset());
+
+    Future<void> elegirPerfil(WidgetTester tester, String perfil) async {
+      await tester.tap(find.byKey(const Key('selector-perfil')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(of: find.byKey(Key('perfil-$perfil')).last, matching: find.byType(Text)).first);
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('el desplegable ofrece los tres perfiles con su ícono', (tester) async {
+      await tester.pumpWidget(appDePrueba());
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('selector-perfil')));
+      await tester.pumpAndSettle();
+
+      for (final perfil in ['cliente', 'tecnico', 'administrador']) {
+        expect(find.byKey(Key('rol-icono-$perfil')), findsWidgets);
+      }
+      expect(find.text('Atiende tus órdenes de trabajo'), findsOneWidget);
+    });
+
+    testWidgets('con el perfil de técnico no se ofrece crear cuenta y se entra a su panel', (tester) async {
+      final tokens = FakeTokenStorage();
+      await tester.pumpWidget(appDePrueba(tokens: tokens, auth: FakeAuthRepository(usuarioSesion: tecnicoDemo)));
+      await tester.pumpAndSettle();
+      await elegirPerfil(tester, 'tecnico');
+
+      expect(find.byKey(const Key('boton-cambiar-modo')), findsNothing);
+      expect(find.textContaining('las crea el administrador'), findsOneWidget);
+
+      await escribir(tester, 'correo', 'tecnico@acmaster.mx');
+      await escribir(tester, 'password', 'AcMaster2026!');
+      await enviar(tester);
+      expect(find.text('RUTA DE HOY'), findsOneWidget);
+      expect(tokens.actual, 'token-tecnico');
+    });
+
+    testWidgets('si la cuenta es de otro perfil, avisa y no guarda la sesión', (tester) async {
+      final tokens = FakeTokenStorage();
+      await tester.pumpWidget(appDePrueba(tokens: tokens));
+      await tester.pumpAndSettle();
+      await elegirPerfil(tester, 'administrador');
+
+      await escribir(tester, 'correo', 'cliente@acmaster.mx');
+      await escribir(tester, 'password', 'AcMaster2026!');
+      await enviar(tester);
+
+      expect(find.text('Esta cuenta es de cliente. Elige ese perfil para entrar.'), findsOneWidget);
+      expect(tokens.actual, isNull);
+    });
   });
 }

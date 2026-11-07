@@ -27,8 +27,15 @@ class SessionController extends AsyncNotifier<Usuario?> {
   }
 
   /// Los errores se propagan para que la pantalla los muestre junto al formulario.
-  Future<void> iniciarSesion({required String correo, required String password}) async {
+  /// Si se indica [perfil] y la cuenta es de otro rol, no se guarda la sesión.
+  Future<void> iniciarSesion({required String correo, required String password, Rol? perfil}) async {
     final sesion = await _auth.iniciarSesion(correo: correo, password: password);
+    if (perfil != null && sesion.usuario.rol != perfil) {
+      throw ApiException(
+        'Esta cuenta es de ${sesion.usuario.rol.etiqueta.toLowerCase()}. Elige ese perfil para entrar.',
+        codigo: 'PERFIL_INCORRECTO',
+      );
+    }
     await _tokens.guardar(sesion.token);
     state = AsyncData(sesion.usuario);
   }

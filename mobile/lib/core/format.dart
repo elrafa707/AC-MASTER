@@ -14,3 +14,6 @@ String pesos(num valor) => '${_pesos.format(valor)} MXN';
 
 /// URL absoluta de un recurso del backend que viene como ruta (/api/v1/fotos/3).
 String urlDelServidor(String ruta) => Uri.parse(AppConfig.apiUrl).replace(path: ruta).toString();
+
+/// "1 equipo" / "2 equipos": concuerda el sustantivo con la cantidad.
+String cantidad(int n, String singular, String plural) => '$n ${n == 1 ? singular : plural}';

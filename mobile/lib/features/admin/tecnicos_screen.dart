@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api/api_exception.dart';
+import '../../core/format.dart';
 import '../../data/admin_repository.dart';
 import '../../models/admin.dart';
 import '../../shared/widgets/dialogos.dart';
@@ -104,7 +105,7 @@ class _TarjetaTecnico extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      '★ ${t.calificacion.toStringAsFixed(1)} · ${t.serviciosActivos} activos · ${t.serviciosFinalizados} terminados',
+                      '★ ${t.calificacion.toStringAsFixed(1)} · ${cantidad(t.serviciosActivos, 'activo', 'activos')} · ${cantidad(t.serviciosFinalizados, 'terminado', 'terminados')}',
                       style: tema.textTheme.bodySmall,
                     ),
                   ),

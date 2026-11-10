@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/format.dart';
 import '../../data/admin_repository.dart';
 import '../../models/admin.dart';
 import '../../shared/widgets/dialogos.dart';
@@ -51,7 +52,7 @@ class _ClientesScreenState extends ConsumerState<ClientesScreen> {
                     return SwitchListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                       title: Text(c.nombre, style: tema.textTheme.titleMedium?.copyWith(fontSize: 14)),
-                      subtitle: Text('${c.correo}\n${c.equipos} equipos · ${c.solicitudes} solicitudes', style: tema.textTheme.bodySmall),
+                      subtitle: Text('${c.correo}\n${cantidad(c.equipos, 'equipo', 'equipos')} · ${cantidad(c.solicitudes, 'solicitud', 'solicitudes')}', style: tema.textTheme.bodySmall),
                       isThreeLine: true,
                       value: c.activo,
                       onChanged: (activo) async {

@@ -78,7 +78,7 @@ class ContenidoFicha extends ConsumerWidget {
                     const SizedBox(height: 8),
                     Text(e.nombre, style: tema.textTheme.headlineSmall?.copyWith(color: c.heroForeground)),
                     const SizedBox(height: 4),
-                    Text('${ficha.historial.length} registros en su historial', style: tema.textTheme.bodyMedium?.copyWith(color: c.heroMuted)),
+                    Text('${cantidad(ficha.historial.length, 'registro', 'registros')} en su historial', style: tema.textTheme.bodyMedium?.copyWith(color: c.heroMuted)),
                   ],
                 ),
               ),
